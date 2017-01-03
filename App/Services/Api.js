@@ -4,7 +4,7 @@ import apisauce from 'apisauce'
 // SAMS TEST
 
 // our "constructor"
-const create = (baseURL = 'http://api.openweathermap.org/data/2.5/') => {
+const create = (baseURL = 'https://api.staging-sm.com/v2/analytics/bc6f2a88-5dd8-40d2-845b-ea44df9c27aa') => {
   // ------
   // STEP 1
   // ------
@@ -16,16 +16,25 @@ const create = (baseURL = 'http://api.openweathermap.org/data/2.5/') => {
     baseURL,
     // here are some default headers
     headers: {
-      'Cache-Control': 'no-cache'
+      'Content-Type': 'application/vnd.api+json;charset=UTF-8',
+      'Authorization': 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6InNicmVuZGVyQHNpbXBseW1lYXN1cmVkLmNvbSIsImFwcF9tZXRhZGF0YSI6eyJpc19zbV9hZG1pbiI6dHJ1ZSwiYXBpX2FjY2VzcyI6dHJ1ZX0sInVzZXJfbWV0YWRhdGEiOnsicHJvZmlsZV9pbWFnZSI6Imh0dHBzOi8vcy5ncmF2YXRhci5jb20vYXZhdGFyLzMyYWVjN2UxNTVjNjU4YmQ0MTkxZGFiZTFmOTE5NmY0P3M9NDgwJnI9cGcmZD1odHRwcyUzQSUyRiUyRmNkbi5hdXRoMC5jb20lMkZhdmF0YXJzJTJGc2IucG5nIiwiZW1haWwiOiJzYnJlbmRlckBzaW1wbHltZWFzdXJlZC5jb20iLCJmaXJzdF9uYW1lIjoiU2FtYW50aGEg8J-QmSIsImxhc3RfbmFtZSI6IkJyZW5kZXIifSwiZW1haWxfdmVyaWZpZWQiOnRydWUsImNsaWVudElEIjoiWXdEWTlENDMzdmVNSENyZWQ3ajBCRVNqbG53RjdyeTgiLCJ1cGRhdGVkX2F0IjoiMjAxNy0wMS0wM1QxOTo1Mjo0Mi4wODdaIiwidXNlcl9pZCI6ImF1dGgwfGM1MzYxYmQ3LTFiZGEtNGY1Yi05YzI5LTRmOTA2ZTIzZjJmNyIsImlkZW50aXRpZXMiOlt7InVzZXJfaWQiOiJjNTM2MWJkNy0xYmRhLTRmNWItOWMyOS00ZjkwNmUyM2YyZjciLCJwcm92aWRlciI6ImF1dGgwIiwiY29ubmVjdGlvbiI6IlVBTURCIiwiaXNTb2NpYWwiOmZhbHNlfV0sImNyZWF0ZWRfYXQiOiIyMDE2LTAzLTI5VDIwOjU3OjIyLjAyMFoiLCJpc3MiOiJodHRwczovL3NpbXBseW1lYXN1cmVkLmF1dGgwLmNvbS8iLCJzdWIiOiJhdXRoMHxjNTM2MWJkNy0xYmRhLTRmNWItOWMyOS00ZjkwNmUyM2YyZjciLCJhdWQiOiJZd0RZOUQ0MzN2ZU1IQ3JlZDdqMEJFU2psbndGN3J5OCIsImV4cCI6MTQ4Mzk3MzE2MywiaWF0IjoxNDgzNDczMTYzfQ.B-2mk_VI3zDsZA3rfjD3KOemCAHPUb1ELFG8qnETyDc'
     },
     // 10 second timeout...
     timeout: 10000
   })
 
-  // Force OpenWeather API Key on all requests
-  api.addRequestTransform((request) => {
-    request.params['APPID'] = '0e44183e8d1018fc92eb3307d885379c'
+  const getData = (params) => api.post('/sessions/metrics', {
+    'filter': ['session.driving_domain_id.neq(37,38,39,40,41)', 'session.referrer_channel.eq(dark_social,facebook,instagram,pinterest,twitter,youtube)', 'session.referrer_channel_type.eq(social)'],
+    'period': 'session.start_time.in(2016-12-27T08:00:00Z...2017-01-03T08:00:00Z).vs(2016-12-20T08:00:00Z...2016-12-27T08:00:00Z)',
+    'tz': 'America/Los_Angeles',
+    'metrics': 'conversion.count.as(goal_completions),conversion.unique_converters.per(session.unique_visits).as(goal_completion_rate),conversion.revenue.as(revenue),conversion.business_value.as(business_value)',
+    'dimensions': 'conversion.type.id'
   })
+
+  // Force OpenWeather API Key on all requests
+  // api.addRequestTransform((request) => {
+  //   request.params['APPID'] = '0e44183e8d1018fc92eb3307d885379c'
+  // })
 
   // Wrap api's addMonitor to allow the calling code to attach
   // additional monitors in the future.  But only in __DEV__ and only
@@ -48,7 +57,7 @@ const create = (baseURL = 'http://api.openweathermap.org/data/2.5/') => {
   // Since we can't hide from that, we embrace it by getting out of the
   // way at this level.
   //
-  const getCity = (city) => api.get('weather', {q: city})
+  // const getCity = (city) => api.get('weather', {q: city})
 
   // ------
   // STEP 3
@@ -64,7 +73,8 @@ const create = (baseURL = 'http://api.openweathermap.org/data/2.5/') => {
   //
   return {
     // a list of the API functions from step 2
-    getCity
+    // getCity
+    getData
   }
 }
 
