@@ -20,6 +20,7 @@ import MapviewExample from '../Containers/MapviewExample'
 import APITestingScreen from '../Containers/APITestingScreen'
 import ThemeScreen from '../Containers/ThemeScreen'
 import DeviceInfoScreen from '../Containers/DeviceInfoScreen'
+import Auth0Lock from '../Containers/auth0Lock'
 
 /* **************************
 * Documentation: https://github.com/aksonov/react-native-router-flux
@@ -31,8 +32,9 @@ class NavigationRouter extends Component {
       <Router>
         <Scene key='drawer' component={NavigationDrawer} open={false}>
           <Scene key='drawerChildrenWrapper' navigationBarStyle={Styles.navBar} titleStyle={Styles.title} leftButtonIconStyle={Styles.leftButton} rightButtonTextStyle={Styles.rightButton}>
-            <Scene initial key='presentationScreen' component={PresentationScreen} title='Ignite' renderLeftButton={NavItems.hamburgerButton} />
+            <Scene initial key='auth0Lock' component={Auth0Lock} title='Login' />
             <Scene key='componentExamples' component={AllComponentsScreen} title='Components' />
+            <Scene key='auth0Lock' component={Auth0Lock} title='auth0 Lock' />
             <Scene key='usageExamples' component={UsageExamplesScreen} title='Usage' rightTitle='Example' onRight={() => window.alert('Example Pressed')} />
             <Scene key='login' component={LoginScreen} title='Login' hideNavBar />
             <Scene key='listviewExample' component={ListviewExample} title='Listview Example' />
