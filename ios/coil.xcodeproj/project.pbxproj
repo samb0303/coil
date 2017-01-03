@@ -37,6 +37,7 @@
 		9A2C5444A9BF49A2B6E48C9C /* Octicons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 837497945C1B4808B73A1F66 /* Octicons.ttf */; };
 		239E3E31E16F4FF5A1759000 /* SimpleLineIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 8E10FDA609774A709B7BCED9 /* SimpleLineIcons.ttf */; };
 		8CE85249590B4C21B70238E9 /* Zocial.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 7CB59C5A1E634891ACFAB33C /* Zocial.ttf */; };
+		041117326D3B455391A566CF /* libA0RNLock.a in Frameworks */ = {isa = PBXBuildFile; fileRef = B6EF5731E3D84A0DB1CE80B0 /* libA0RNLock.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -175,6 +176,8 @@
 		837497945C1B4808B73A1F66 /* Octicons.ttf */ = {isa = PBXFileReference; name = "Octicons.ttf"; path = "../node_modules/react-native-vector-icons/Fonts/Octicons.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
 		8E10FDA609774A709B7BCED9 /* SimpleLineIcons.ttf */ = {isa = PBXFileReference; name = "SimpleLineIcons.ttf"; path = "../node_modules/react-native-vector-icons/Fonts/SimpleLineIcons.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
 		7CB59C5A1E634891ACFAB33C /* Zocial.ttf */ = {isa = PBXFileReference; name = "Zocial.ttf"; path = "../node_modules/react-native-vector-icons/Fonts/Zocial.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		82F511CF93D9422BBA7C49D4 /* A0RNLock.xcodeproj */ = {isa = PBXFileReference; name = "A0RNLock.xcodeproj"; path = "../node_modules/react-native-lock/ios/A0RNLock.xcodeproj"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = wrapper.pb-project; explicitFileType = undefined; includeInIndex = 0; };
+		B6EF5731E3D84A0DB1CE80B0 /* libA0RNLock.a */ = {isa = PBXFileReference; name = "libA0RNLock.a"; path = "libA0RNLock.a"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = archive.ar; explicitFileType = undefined; includeInIndex = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -206,6 +209,7 @@
 				BD26A276F1B94E768A805646 /* libRNI18n.a in Frameworks */,
 				82C6C0F49AB148978AA52C01 /* libAirMaps.a in Frameworks */,
 				6EE53B3F2F8E48C2B640D771 /* libRNVectorIcons.a in Frameworks */,
+				041117326D3B455391A566CF /* libA0RNLock.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -343,6 +347,7 @@
 				4F38E7EFB376456785303331 /* RNI18n.xcodeproj */,
 				B10AD767E3C24C9380DEB2B1 /* AirMaps.xcodeproj */,
 				85A2F7EF85D94DA393F6F492 /* RNVectorIcons.xcodeproj */,
+				82F511CF93D9422BBA7C49D4 /* A0RNLock.xcodeproj */,
 			);
 			name = Libraries;
 			sourceTree = "<group>";
@@ -706,6 +711,7 @@
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 				);
 			};
 			name = Debug;
@@ -722,6 +728,7 @@
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/coil.app/coil";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
@@ -809,6 +816,7 @@
 					"$(SRCROOT)/../node_modules/react-native-i18n/RNI18n",
 					"$(SRCROOT)/../node_modules/react-native-maps/ios/**",
 					"$(SRCROOT)/../node_modules/react-native-vector-icons/RNVectorIconsManager",
+					"$(SRCROOT)/../node_modules/react-native-lock/ios/A0RNLock/**",
 				);
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				MTL_ENABLE_DEBUG_INFO = YES;
@@ -854,6 +862,7 @@
 					"$(SRCROOT)/../node_modules/react-native-i18n/RNI18n",
 					"$(SRCROOT)/../node_modules/react-native-maps/ios/**",
 					"$(SRCROOT)/../node_modules/react-native-vector-icons/RNVectorIconsManager",
+					"$(SRCROOT)/../node_modules/react-native-lock/ios/A0RNLock/**",
 				);
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
