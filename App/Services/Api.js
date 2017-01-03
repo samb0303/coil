@@ -24,11 +24,10 @@ const create = (baseURL = 'https://api.staging-sm.com/v2/analytics/bc6f2a88-5dd8
   })
 
   const getData = (params) => api.post('/sessions/metrics', {
-    'filter': ['session.driving_domain_id.neq(37,38,39,40,41)', 'session.referrer_channel.eq(dark_social,facebook,instagram,pinterest,twitter,youtube)', 'session.referrer_channel_type.eq(social)'],
-    'period': 'session.start_time.in(2016-12-27T08:00:00Z...2017-01-03T08:00:00Z).vs(2016-12-20T08:00:00Z...2016-12-27T08:00:00Z)',
+    'filter': 'session.referrer_channel_type.eq(social)',
     'tz': 'America/Los_Angeles',
-    'metrics': 'conversion.count.as(goal_completions),conversion.unique_converters.per(session.unique_visits).as(goal_completion_rate),conversion.revenue.as(revenue),conversion.business_value.as(business_value)',
-    'dimensions': 'conversion.type.id'
+    'metrics': 'session.count.as(visits)',
+    'dimensions': 'session.referrer_channel'
   })
 
   // Force OpenWeather API Key on all requests
