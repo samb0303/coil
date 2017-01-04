@@ -35,6 +35,7 @@ export default class auth0Lock extends React.Component {
       }
       // Authentication worked!
       Actions.componentExamples()
+      this.state.user = { profile, token }
     });
   }
 
