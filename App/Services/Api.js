@@ -23,12 +23,7 @@ const create = (baseURL = 'https://api.staging-sm.com/v2/analytics/bc6f2a88-5dd8
     timeout: 10000
   })
 
-  const getData = (params) => api.post('/sessions/metrics', {
-    'tz': ['America/Los_Angeles'],
-    'filter': ['session.referrer_channel_type.eq(social)', 'session.referrer_channel.eq(dark_social,facebook,instagram,pinterest,twitter,youtube)', 'session.driving_domain_id.neq(38,39)'],
-    'period': ['session.start_time.in(2016-09-01T07:00:00Z...2016-10-01T07:00:00Z).vs(2016-08-02T07:00:00Z...2016-09-01T07:00:00Z)'],
-    'metrics': ['session.duration.per(session.count).as(average_time_on_site),conversion.revenue.per(conversion.purchases_count).as(average_order_value),session.bounces_count.per(session.count).as(bounce_rate),conversion.business_value.as(business_value),conversion.count.as(goal_completions),conversion.unique_converters.per(session.unique_visits).as(goal_completion_rate),conversion.purchases_count.as(purchases),conversion.unique_purchasers.per(session.unique_visits).as(purchase_conversion_rate),conversion.items_count.per(conversion.purchases_count).as(items_per_purchase),session.pageviews.as(pageviews),conversion.revenue.as(revenue),session.count.as(visits),session.unique_pageviews.as(unique_pageviews),session.unique_pageviews.per(session.unique_visits).as(unique_pageviews_per_unique_visits),session.unique_visits.as(unique_visits)']
-  })
+  const getData = (filters) => api.post('/sessions/metrics', filters)
 
   // Force OpenWeather API Key on all requests
   // api.addRequestTransform((request) => {
