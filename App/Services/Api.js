@@ -3,7 +3,7 @@ import apisauce from 'apisauce'
 
 // SAMS TEST
 
-// our "constructor"
+// our 'constructor'
 const create = (baseURL = 'https://api.staging-sm.com/v2/analytics/bc6f2a88-5dd8-40d2-845b-ea44df9c27aa') => {
   // ------
   // STEP 1
@@ -24,10 +24,10 @@ const create = (baseURL = 'https://api.staging-sm.com/v2/analytics/bc6f2a88-5dd8
   })
 
   const getData = (params) => api.post('/sessions/metrics', {
-    'filter': 'session.referrer_channel_type.eq(social)',
-    'tz': 'America/Los_Angeles',
-    'metrics': 'session.count.as(visits)',
-    'dimensions': 'session.referrer_channel'
+    'tz': ['America/Los_Angeles'],
+    'filter': ['session.referrer_channel_type.eq(social)', 'session.referrer_channel.eq(dark_social,facebook,instagram,pinterest,twitter,youtube)', 'session.driving_domain_id.neq(38,39)'],
+    'period': ['session.start_time.in(2016-09-01T07:00:00Z...2016-10-01T07:00:00Z).vs(2016-08-02T07:00:00Z...2016-09-01T07:00:00Z)'],
+    'metrics': ['session.duration.per(session.count).as(average_time_on_site),conversion.revenue.per(conversion.purchases_count).as(average_order_value),session.bounces_count.per(session.count).as(bounce_rate),conversion.business_value.as(business_value),conversion.count.as(goal_completions),conversion.unique_converters.per(session.unique_visits).as(goal_completion_rate),conversion.purchases_count.as(purchases),conversion.unique_purchasers.per(session.unique_visits).as(purchase_conversion_rate),conversion.items_count.per(conversion.purchases_count).as(items_per_purchase),session.pageviews.as(pageviews),conversion.revenue.as(revenue),session.count.as(visits),session.unique_pageviews.as(unique_pageviews),session.unique_pageviews.per(session.unique_visits).as(unique_pageviews_per_unique_visits),session.unique_visits.as(unique_visits)']
   })
 
   // Force OpenWeather API Key on all requests
@@ -48,7 +48,7 @@ const create = (baseURL = 'https://api.staging-sm.com/v2/analytics/bc6f2a88-5dd8
   //
   // Define some functions that call the api.  The goal is to provide
   // a thin wrapper of the api layer providing nicer feeling functions
-  // rather than "get", "post" and friends.
+  // rather than 'get', 'post' and friends.
   //
   // I generally don't like wrapping the output at this level because
   // sometimes specific actions need to be take on `403` or `401`, etc.
