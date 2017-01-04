@@ -2,6 +2,7 @@
 
 import React from 'react'
 import { ScrollView, Text, View, KeyboardAvoidingView } from 'react-native'
+import { Actions } from 'react-native-router-flux';
 import { connect } from 'react-redux'
 // Add Actions - replace 'Your' with whatever your reducer is called :)
 // import YourActions from '../Redux/YourRedux'
@@ -22,6 +23,10 @@ var lock = new Auth0Lock({clientId: 'YwDY9D433veMHCred7j0BESjlnwF7ry8', domain: 
 
 export default class auth0Lock extends React.Component {
 
+  constructor(props) {
+    super(props)
+  }
+
   componentWillMount() {
     lock.show({}, (err, profile, token) => {
       if (err) {
@@ -29,7 +34,7 @@ export default class auth0Lock extends React.Component {
         return;
       }
       // Authentication worked!
-      console.log('Logged in with Auth0!');
+      Actions.componentExamples()
     });
   }
 
