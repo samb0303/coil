@@ -1,7 +1,7 @@
 // @flow
 
 import React from 'react'
-import { ScrollView, Text, View, KeyboardAvoidingView } from 'react-native'
+import { ScrollView, Text, View, KeyboardAvoidingView, AsyncStorage } from 'react-native'
 import { Actions } from 'react-native-router-flux';
 import { connect } from 'react-redux'
 // Add Actions - replace 'Your' with whatever your reducer is called :)
@@ -34,11 +34,31 @@ export default class auth0Lock extends React.Component {
         return;
       }
       // Authentication worked!
-      Actions.componentExamples()
-      this.state.user = { profile, token }
+      try {
+        AsyncStorage.multiSet([['userProfile', JSON.parse(profile)], ['userToken', JSON.parse(token)]]);
+      } catch (error) {
+        console.tron.log(error);
+      }
+
+      fetch(`https://api.staging-sm.com/v2/users/${profile.identities[0].userId}/assigned-permissions?include[assigned-permissions]=account`, {
+        method: 'GET',
+        headers: {
+          'Authorization': 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6ImFzbmlkZXJAc2ltcGx5bWVhc3VyZWQuY29tIiwiYXBwX21ldGFkYXRhIjp7ImlzX3NtX2FkbWluIjp0cnVlLCJhcGlfYWNjZXNzIjp0cnVlfSwidXNlcl9tZXRhZGF0YSI6eyJwcm9maWxlX2ltYWdlIjoiaHR0cHM6Ly9zLmdyYXZhdGFyLmNvbS9hdmF0YXIvNTk0NjQ4Mjk4MmVjOWU5NDU3YzJmZjY5NjhjNmU5ODk_cz00ODAmcj1wZyZkPWh0dHBzJTNBJTJGJTJGY2RuLmF1dGgwLmNvbSUyRmF2YXRhcnMlMkZhcy5wbmciLCJlbWFpbCI6ImFzbmlkZXJAc2ltcGx5bWVhc3VyZWQuY29tIiwiZmlyc3RfbmFtZSI6IkFsZXgg8J-SgfCfj7siLCJsYXN0X25hbWUiOiJTbmlkZXIifSwiZW1haWxfdmVyaWZpZWQiOnRydWUsImNsaWVudElEIjoiWXdEWTlENDMzdmVNSENyZWQ3ajBCRVNqbG53RjdyeTgiLCJ1cGRhdGVkX2F0IjoiMjAxNy0wMS0wNFQyMDowMjoyMC45NDRaIiwidXNlcl9pZCI6ImF1dGgwfDQ2ZGQxMzU4LTdiYjItNDNiMS1hZGNkLWFkODgwZmQwMWQzYiIsImlkZW50aXRpZXMiOlt7InVzZXJfaWQiOiI0NmRkMTM1OC03YmIyLTQzYjEtYWRjZC1hZDg4MGZkMDFkM2IiLCJwcm92aWRlciI6ImF1dGgwIiwiY29ubmVjdGlvbiI6IlVBTURCIiwiaXNTb2NpYWwiOmZhbHNlfV0sImNyZWF0ZWRfYXQiOiIyMDE2LTAzLTI4VDIyOjM3OjExLjAyN1oiLCJpc3MiOiJodHRwczovL3NpbXBseW1lYXN1cmVkLmF1dGgwLmNvbS8iLCJzdWIiOiJhdXRoMHw0NmRkMTM1OC03YmIyLTQzYjEtYWRjZC1hZDg4MGZkMDFkM2IiLCJhdWQiOiJZd0RZOUQ0MzN2ZU1IQ3JlZDdqMEJFU2psbndGN3J5OCIsImV4cCI6MTQ4NDA2MDE0MSwiaWF0IjoxNDgzNTYwMTQxfQ.klJDJBrRNOilTXvyRb8XpwpB2vdXYROEdK3QwNvzxpk'
+        }
+      })
+        .then((response) => response.json())
+        .then((responseJson) => {
+          AsyncStorage.setItem('userAccounts', JSON.parse(responseJson.included.map((item) => {
+            return {
+              name: item.attributes.name,
+              id: item.id
+            }
+          })));
+        })
+        .catch((error) => console.tron.log(error))
+      Actions.componentExamples();
     });
   }
-
   render () {
     return (
       <View style={styles.mainContainer}>
