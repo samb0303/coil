@@ -1,11 +1,11 @@
 // @flow
 
 import React from 'react'
-import { ScrollView, Text, KeyboardAvoidingView } from 'react-native'
+import { ScrollView, Text, KeyboardAvoidingView, View } from 'react-native'
 import { connect } from 'react-redux'
 // Add Actions - replace 'Your' with whatever your reducer is called :)
 // import YourActions from '../Redux/YourRedux'
-import { Metrics } from '../Themes'
+import { Metrics, Colors } from '../Themes'
 // external libs
 // import Icon from 'react-native-vector-icons/FontAwesome'
 // import Animatable from 'react-native-animatable'
@@ -105,10 +105,11 @@ class Data extends React.Component {
     return (
       <ScrollView style={styles.mainContainer} ref='container'>
         <KeyboardAvoidingView behavior='position'>
-          <Text> Start Date:</Text>
-          <TheDatePicker ref='start-date' dateChanged={this.startDateChanged} date={this.state.startDate} />
-          <Text> End Date:</Text>
-          <TheDatePicker ref='end-date' dateChanged={this.endDateChanged} date={this.state.endDate} />
+          <View style={styles.datePickers}>
+
+            <TheDatePicker ref='start-date' dateChanged={this.startDateChanged} date={this.state.startDate} />
+            <TheDatePicker ref='end-date' dateChanged={this.endDateChanged} date={this.state.endDate} />
+          </View>
           <APIResult ref='result' metrics={this.state.metrics} />
         </KeyboardAvoidingView>
       </ScrollView>
@@ -144,17 +145,47 @@ class APIResult extends React.Component {
 
   getGoalCompletions () {
     if (this.props.metrics) {
-      // console.tron.log(`GET GOAL COMPLETIONS: ${this.state.metrics['goal_completions']}`)
-
       return FJSON.plain(this.props.metrics['goal_completions'])
+    }
+  }
+
+  getVisits () {
+    if (this.props.metics) {
+      return FJSON.plain(this.props.metrics['visits'])
+    }
+  }
+
+  getRevenue () {
+    if (this.props.metrics) {
+      return FJSON.plain(this.props.metrics['revenue'])
+    }
+  }
+
+  getBusinessValue () {
+    if (this.props.metrics) {
+      return FJSON.plain(this.props.metrics['business_value'])
     }
   }
 
   renderView () {
     return (
-      <Text style={{fontFamily: 'CourierNewPS-BoldMT', fontSize: 10}}>
-        Goal Completions {this.getGoalCompletions()}
-      </Text>
+      <View>
+        <Text style={styles.metricHeader}>
+          GOAL COMPLETIONS
+        </Text>
+        <Text style={styles.metric}>
+          {this.getGoalCompletions()}
+        </Text>
+        <Text style={{fontFamily: 'CourierNewPS-BoldMT', fontSize: 10}}>
+          Visits: {this.getVisits()}
+        </Text>
+        <Text style={{fontFamily: 'CourierNewPS-BoldMT', fontSize: 10}}>
+          Revenue: {this.getRevenue()}
+        </Text>
+        <Text style={{fontFamily: 'CourierNewPS-BoldMT', fontSize: 10}}>
+          Business Value: {this.getBusinessValue()}
+        </Text>
+      </View>
     )
   }
 
@@ -180,17 +211,32 @@ export class TheDatePicker extends React.Component {
         format='YYYY-MM-DD'
         confirmBtnText='Confirm'
         cancelBtnText='Cancel'
+        showIcon={false}
         customStyles={{
           dateIcon: {
-            position: 'absolute',
-            left: 0,
-            top: 4,
+            width: 0,
             marginLeft: 0
           },
           dateInput: {
-            marginLeft: 36
+            // marginLeft: 20,
+            marginRight: 0,
+            borderRadius: 4,
+            width: 50
+          },
+          dateText: {
+            color: Colors.smLightGray
+          },
+          datePickerMask: {
+            display: 'inline',
+            backgroundColor: Colors.smDarkGray
+          },
+          dateTouchBody: {
+            // backgroundColor: Colors.smDarkGray,
+            width: 150
+          },
+          dateTouch: {
+            width: 100
           }
-          // ... You can check the source to find the other keys.
         }}
         onDateChange={(date) => { this.props.dateChanged(date) }}
       />
