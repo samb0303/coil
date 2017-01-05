@@ -56,7 +56,7 @@ export default class auth0Lock extends React.Component {
           })));
         })
         .catch((error) => console.tron.log(error))
-      Actions.componentExamples();
+      Actions.goalScreen();
     });
   }
   render () {
