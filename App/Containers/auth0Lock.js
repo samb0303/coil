@@ -17,6 +17,7 @@ import styles from './Styles/PresentationScreenStyle'
 
 // I18n
 import I18n from 'react-native-i18n'
+import Reactotron from 'reactotron-react-native'
 
 var Auth0Lock = require('react-native-lock');
 var lock = new Auth0Lock({clientId: 'YwDY9D433veMHCred7j0BESjlnwF7ry8', domain: 'simplymeasured.auth0.com'});
@@ -29,11 +30,11 @@ export default class auth0Lock extends React.Component {
 
   componentWillMount() {
     AsyncStorage.getItem('userToken', (err, result) => {
-      console.tron.log(result)
+      Reactotron.log(result)
     })
     lock.show({}, (err, profile, token) => {
       if (err) {
-        console.log(err);
+        Reactotron.log(err);
         return;
       }
       // Authentication worked!
