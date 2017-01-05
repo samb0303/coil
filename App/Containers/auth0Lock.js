@@ -28,6 +28,9 @@ export default class auth0Lock extends React.Component {
   }
 
   componentWillMount() {
+    AsyncStorage.getItem('userToken', (err, result) => {
+      console.tron.log(result)
+    })
     lock.show({}, (err, profile, token) => {
       if (err) {
         console.log(err);
