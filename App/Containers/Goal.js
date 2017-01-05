@@ -3,7 +3,6 @@
 import React from 'react'
 import { View, ScrollView, Text, KeyboardAvoidingView, TextInput, Picker, TouchableOpacity, Alert, AsyncStorage } from 'react-native'
 import { connect } from 'react-redux'
-import { Actions as NavigationActions } from 'react-native-router-flux'
 
 // Styles
 import styles from './Styles/GoalStyle'
@@ -16,26 +15,26 @@ var GOAL_METRICS = {
 }
 
 class Goal extends React.Component {
-  
-  constructor(props) {
+
+  constructor (props) {
     super(props)
-    
+
     this.state = {
       selectedGoal: 'impressions',
       selectedGoalDisplayText: 'Impressions'
     }
-    
+
     this.saveAndProceed = this.saveAndProceed.bind(this)
   }
 
-  setGoal(metric) {
+  setGoal (metric) {
     this.setState({
       selectedGoal: metric,
       selectedGoalDisplayText: GOAL_METRICS[metric]
     })
   }
 
-  saveAndProceed() {
+  saveAndProceed () {
     try {
       AsyncStorage.setItem('goalMetric', this.state.selectedGoal)
       // go to next view
