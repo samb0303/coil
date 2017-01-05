@@ -20,6 +20,7 @@ import MapviewExample from '../Containers/MapviewExample'
 import APITestingScreen from '../Containers/APITestingScreen'
 import ThemeScreen from '../Containers/ThemeScreen'
 import DeviceInfoScreen from '../Containers/DeviceInfoScreen'
+import DataScreen from '../Containers/Data'
 import GoalScreen from '../Containers/Goal'
 
 /* **************************
@@ -44,6 +45,7 @@ class NavigationRouter extends Component {
             <Scene key='mapviewExample' component={MapviewExample} title='Mapview Example' />
             <Scene key='apiTesting' component={APITestingScreen} title='API Testing' />
             <Scene key='theme' component={ThemeScreen} title='Theme' />
+            <Scene key='data' component={DataScreen} title='Data' />
 
             {/* Custom navigation bar example */}
             <Scene key='deviceInfo' component={DeviceInfoScreen} title='Device Info' />
