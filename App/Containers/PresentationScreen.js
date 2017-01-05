@@ -30,6 +30,8 @@ export default class PresentationScreen extends React.Component {
             Data Screen
           </RoundedButton>
 
+          <RoundedButton onPress={NavigationActions.goalScreen}>Set Goal</RoundedButton>
+
           <RoundedButton onPress={NavigationActions.componentExamples}>
             Component Examples Screen
           </RoundedButton>
