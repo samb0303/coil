@@ -20,7 +20,7 @@ import I18n from 'react-native-i18n'
 import Reactotron from 'reactotron-react-native'
 
 var Auth0Lock = require('react-native-lock');
-var lock = new Auth0Lock({clientId: 'YwDY9D433veMHCred7j0BESjlnwF7ry8', domain: 'simplymeasured.auth0.com'});
+var lock = new Auth0Lock({clientId: 'mSd3IB3npgzW25nGn0Ixy1SeL7V2EKKE', domain: 'simplymeasured-prod.auth0.com'});
 
 export default class auth0Lock extends React.Component {
 
@@ -32,7 +32,11 @@ export default class auth0Lock extends React.Component {
     AsyncStorage.getItem('userToken', (err, result) => {
       Reactotron.log(result)
     })
-    lock.show({}, (err, profile, token) => {
+    lock.show({
+      authParams: {
+        scope: 'openid profile'
+      }
+    }, (err, profile, token) => {
       if (err) {
         Reactotron.log(err);
         return;
@@ -44,23 +48,25 @@ export default class auth0Lock extends React.Component {
         console.tron.log(error);
       }
 
-      fetch(`https://api.staging-sm.com/v2/users/${profile.identities[0].userId}/assigned-permissions?include[assigned-permissions]=account`, {
+      fetch(`https://api.simplymeasured.com/v2/users/${profile.identities[0].userId}/assigned-permissions?include[assigned-permissions]=account&filter[accounts][is_active]=true`, {
         method: 'GET',
         headers: {
-          'Authorization': 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6ImFzbmlkZXJAc2ltcGx5bWVhc3VyZWQuY29tIiwiYXBwX21ldGFkYXRhIjp7ImlzX3NtX2FkbWluIjp0cnVlLCJhcGlfYWNjZXNzIjp0cnVlfSwidXNlcl9tZXRhZGF0YSI6eyJwcm9maWxlX2ltYWdlIjoiaHR0cHM6Ly9zLmdyYXZhdGFyLmNvbS9hdmF0YXIvNTk0NjQ4Mjk4MmVjOWU5NDU3YzJmZjY5NjhjNmU5ODk_cz00ODAmcj1wZyZkPWh0dHBzJTNBJTJGJTJGY2RuLmF1dGgwLmNvbSUyRmF2YXRhcnMlMkZhcy5wbmciLCJlbWFpbCI6ImFzbmlkZXJAc2ltcGx5bWVhc3VyZWQuY29tIiwiZmlyc3RfbmFtZSI6IkFsZXgg8J-SgfCfj7siLCJsYXN0X25hbWUiOiJTbmlkZXIifSwiZW1haWxfdmVyaWZpZWQiOnRydWUsImNsaWVudElEIjoiWXdEWTlENDMzdmVNSENyZWQ3ajBCRVNqbG53RjdyeTgiLCJ1cGRhdGVkX2F0IjoiMjAxNy0wMS0wNFQyMDowMjoyMC45NDRaIiwidXNlcl9pZCI6ImF1dGgwfDQ2ZGQxMzU4LTdiYjItNDNiMS1hZGNkLWFkODgwZmQwMWQzYiIsImlkZW50aXRpZXMiOlt7InVzZXJfaWQiOiI0NmRkMTM1OC03YmIyLTQzYjEtYWRjZC1hZDg4MGZkMDFkM2IiLCJwcm92aWRlciI6ImF1dGgwIiwiY29ubmVjdGlvbiI6IlVBTURCIiwiaXNTb2NpYWwiOmZhbHNlfV0sImNyZWF0ZWRfYXQiOiIyMDE2LTAzLTI4VDIyOjM3OjExLjAyN1oiLCJpc3MiOiJodHRwczovL3NpbXBseW1lYXN1cmVkLmF1dGgwLmNvbS8iLCJzdWIiOiJhdXRoMHw0NmRkMTM1OC03YmIyLTQzYjEtYWRjZC1hZDg4MGZkMDFkM2IiLCJhdWQiOiJZd0RZOUQ0MzN2ZU1IQ3JlZDdqMEJFU2psbndGN3J5OCIsImV4cCI6MTQ4NDA2MDE0MSwiaWF0IjoxNDgzNTYwMTQxfQ.klJDJBrRNOilTXvyRb8XpwpB2vdXYROEdK3QwNvzxpk'
+          'Authorization': `Bearer ${token.idToken}`
         }
       })
         .then((response) => response.json())
         .then((responseJson) => {
-          AsyncStorage.setItem('userAccounts', JSON.parse(responseJson.included.map((item) => {
-            return {
+          AsyncStorage.setItem('userAccounts', JSON.stringify(responseJson.included.map((item) => {
+            let value = {
               name: item.attributes.name,
               id: item.id
             }
+            
+            return value
           })));
         })
-        .catch((error) => console.tron.log(error))
-      Actions.goalScreen();
+        .then(() => Actions.goalScreen())
+        .catch((error) => console.tron.log(String(error)))
     });
   }
   render () {
