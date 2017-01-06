@@ -54,7 +54,8 @@ class Data extends React.Component {
       comparisonEndDate: comparisonEndDate.format('YYYY-MM-DD'),
       metrics: {},
       channelMetrics: {},
-      deltaPercentages: {}
+      deltaPercentages: {},
+      deltaValues: {}
     }
 
     this.startDateChanged = this.startDateChanged.bind(this)
@@ -144,8 +145,10 @@ class Data extends React.Component {
       const data = response.data['data'][0].attributes
       const metrics = data.metrics
       const deltaPercentages = data['delta_percentages']
+      const deltaValues = data['delta_values']
+      console.tron.log(`DELTA VALUES: ${FJSON.plain(deltaValues)}`)
 
-      this.setState({ metrics: metrics, deltaPercentages: deltaPercentages })
+      this.setState({ metrics: metrics, deltaPercentages: deltaPercentages, deltaValues: deltaValues })
     } else {
       this.refs.container.setState({result: `${response.problem} - ${response.status}`})
     }
@@ -195,7 +198,7 @@ class Data extends React.Component {
               VS. {moment(this.state.comparisonStartDate).format('MMM D, YYYY')} - {moment(this.state.comparisonEndDate).format('MMM D, YYYY')}
             </Text>
           </View>
-          <APIResult ref='result' metrics={this.state.metrics} channelMetrics={this.state.channelMetrics} deltaPercentages={this.state.deltaPercentages} />
+          <APIResult ref='result' metrics={this.state.metrics} channelMetrics={this.state.channelMetrics} deltaPercentages={this.state.deltaPercentages} deltaValues={this.state.deltaValues} />
         </KeyboardAvoidingView>
       </ScrollView>
     )
@@ -238,11 +241,20 @@ class APIResult extends React.Component {
 
   getTotalValue () {
     if (this.props.metrics['business_value'] && this.props.metrics['revenue']) {
-      return numeral(this.props.metrics['business_value'] + this.props.metrics['revenue']).format('($0.00a)')
+      return this.props.metrics['business_value'] + this.props.metrics['revenue']
     } else if (this.props.metrics['business_value']) {
-      return numeral(this.props.metrics['business_value']).format('($0.00a)')
+      return this.props.metrics['business_value']
     } else if (this.props.metrics['revenue']) {
-      return numeral(this.props.metrics['revenue']).format('($0.00a)')
+      return this.props.metrics['revenue']
+    } else {
+      return null
+    }
+  }
+
+  getFormattedTotalValue () {
+    const totalValue = this.getTotalValue()
+    if (totalValue) {
+      return numeral(totalValue).format('($0.00a)')
     } else {
       return '--'
     }
@@ -252,7 +264,7 @@ class APIResult extends React.Component {
     let metricValue = ''
 
     if (metric === 'total_value') {
-      metricValue = this.getTotalValue()
+      metricValue = this.getFormattedTotalValue()
     } else {
       metricValue = this.getMetric(metric)
     }
@@ -282,15 +294,21 @@ class APIResult extends React.Component {
     }
   }
 
+  getTotalDeltaValue () {
+    return this.props.deltaValues['business_value'] + this.props.deltaValues['revenue']
+  }
+
   getTotalValuePercentages () {
-    if (this.props.deltaPercentages['business_value'] && this.props.deltaPercentages['revenue']) {
-      return this.props.deltaPercentages['business_value'] + this.props.deltaPercentages['revenue']
-    } else if (this.props.deltaPercentages['business_value']) {
-      return this.props.deltaPercentages['business_value']
-    } else if (this.props.deltaPercentages['revenue']) {
-      return this.props.deltaPercentages['revenue']
-    } else {
-      return false
+    if (this.props.deltaValues) {
+      let socialRoi = this.getTotalValue()
+      let socialRoiDeltaValue = this.getTotalDeltaValue()
+
+      console.tron.log(`SOCIAL ROI: ${socialRoi}`)
+      console.tron.log(`SOCIAL ROI DELTA: ${socialRoiDeltaValue}`)
+
+      let socialRoiPrevious = socialRoi - socialRoiDeltaValue
+
+      return (socialRoiDeltaValue) / Math.abs(socialRoiPrevious) * 100
     }
   }
 
