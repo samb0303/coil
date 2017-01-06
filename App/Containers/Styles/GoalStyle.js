@@ -15,8 +15,5 @@ export default StyleSheet.create({
     flex: 1,
     height: StyleSheet.hairlineWidth,
     backgroundColor: '#6088E0'
-  },
-  highlightedRow: {
-    backgroundColor: 'red'
   }
 })
