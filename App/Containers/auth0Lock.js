@@ -21,9 +21,6 @@ export default class auth0Lock extends React.Component {
   }
 
   componentWillMount() {
-    AsyncStorage.getItem('userToken', (err, result) => {
-      Reactotron.log(result)
-    })
     lock.show({
       authParams: {
         scope: 'openid profile'
@@ -35,9 +32,10 @@ export default class auth0Lock extends React.Component {
       }
       // Authentication worked!
       try {
-        AsyncStorage.multiSet([['userProfile', JSON.parse(profile)], ['userToken', JSON.parse(token)]])
+        console.tron.log(`USER TOKEN: ${token.idToken}`)
+        AsyncStorage.setItem('userToken', token.idToken)
       } catch (error) {
-        console.tron.log(error)
+        console.tron.log(`ERROR SETTING TOKEN: ${error}`)
       }
 
       fetch(`https://api.staging-sm.com/v2/users/${profile.identities[0].userId}/assigned-permissions?include[assigned-permissions]=account&filter[accounts][is_active]=true`, {
@@ -69,4 +67,3 @@ export default class auth0Lock extends React.Component {
   }
 
 }
-

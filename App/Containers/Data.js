@@ -26,6 +26,7 @@ import update from 'immutability-helper'
 import Icon from 'react-native-vector-icons/FontAwesome'
 import { FormattedNumber, FormattedCurrency } from 'react-native-globalize'
 import numeral from 'numeral'
+import { AsyncStorage } from 'react-native'
 
 class Data extends React.Component {
   state: {
@@ -56,23 +57,30 @@ class Data extends React.Component {
       deltaPercentages: {}
     }
 
-    this.api = API.create()
-
     this.startDateChanged = this.startDateChanged.bind(this)
     this.endDateChanged = this.endDateChanged.bind(this)
     this.getComparisonDates = this.getComparisonDates.bind(this)
   }
 
+  componentWillMount () {
+    AsyncStorage.multiGet(['userToken', 'selectedAccount'], (err, result) => {
+      const [token, accountId] = result
+      console.tron.log(`TOKEN: ${token[1]}`)
+      console.tron.log(`ACCOUNT: ${accountId[1]}`)
+      this.setState({token: token[1], accountId: accountId[1]})
+
+      this.api = API.create(token[1], accountId[1])
+    })
+  }
+
   componentDidMount () {
-    // this.setComparisonDates()
-    this.getData()
-    this.getChannelData()
+    if (this.state.accountId && this.state.token) {
+      this.getData()
+      this.getChannelData()
+    }
   }
 
   getData () {
-    // console.tron.log(`Get Data Start Date: ${this.state.startDate}`)
-    // console.tron.log(`End Date: ${this.state.endDate}`)
-
     const filters = {
       'tz': ['America/Los_Angeles'],
       'filter': ['session.referrer_channel_type.eq(social)', 'session.referrer_channel.eq(dark_social,facebook,instagram,pinterest,twitter,youtube)', 'session.driving_domain_id.neq(38,39)'],
@@ -80,7 +88,6 @@ class Data extends React.Component {
       'metrics': ['session.duration.per(session.count).as(average_time_on_site),conversion.revenue.per(conversion.purchases_count).as(average_order_value),session.bounces_count.per(session.count).as(bounce_rate),conversion.business_value.as(business_value),conversion.count.as(goal_completions),conversion.unique_converters.per(session.unique_visits).as(goal_completion_rate),conversion.purchases_count.as(purchases),conversion.unique_purchasers.per(session.unique_visits).as(purchase_conversion_rate),conversion.items_count.per(conversion.purchases_count).as(items_per_purchase),session.pageviews.as(pageviews),conversion.revenue.as(revenue),session.count.as(visits),session.unique_pageviews.as(unique_pageviews),session.unique_pageviews.per(session.unique_visits).as(unique_pageviews_per_unique_visits),session.unique_visits.as(unique_visits)']
     }
 
-    // 'period': [`session.start_time.in(2016-09-01T07:00:00Z...2016-10-01T07:00:00Z).vs(2016-08-02T07:00:00Z...2016-09-01T07:00:00Z)`]
     this.api['getData'](filters).then((result) => {
       this.showResult(result, 'Result')
     })
@@ -133,10 +140,7 @@ class Data extends React.Component {
   }
 
   showResult (response: Object, title: string = 'Response') {
-    // this.refs.container.scrollTo({x: 0, y: 0, animated: true})
     if (response.ok) {
-      // console.tron.log(`DATA: ${FJSON.plain(response.data['data'][0])}`)
-
       const data = response.data['data'][0].attributes
       const metrics = data.metrics
       const deltaPercentages = data['delta_percentages']
@@ -580,8 +584,6 @@ class APIResult extends React.Component {
 
   render () {
     let messageView = null
-    // console.tron.log(`CHANNEL DATA PROPS: ${FJSON.plain(this.props.channelMetrics)}`)
-    console.tron.log(`METRICS: ${FJSON.plain(this.props.metrics)}`)
 
     if (this.props.metrics) {
       return this.renderView()

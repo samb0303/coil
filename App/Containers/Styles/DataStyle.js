@@ -122,7 +122,6 @@ export default StyleSheet.create({
     flex: 1,
     flexDirection: 'column',
     alignItems: 'center',
-    // fontSize: Fonts.size.h5
   },
 
   channelMetricItem: {

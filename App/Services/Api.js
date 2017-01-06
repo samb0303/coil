@@ -4,7 +4,7 @@ import apisauce from 'apisauce'
 // SAMS TEST
 
 // our 'constructor'
-const create = (baseURL = 'https://api.staging-sm.com/v2/analytics/bc6f2a88-5dd8-40d2-845b-ea44df9c27aa') => {
+const create = (token, accountId) => {
   // ------
   // STEP 1
   // ------
@@ -13,11 +13,11 @@ const create = (baseURL = 'https://api.staging-sm.com/v2/analytics/bc6f2a88-5dd8
   //
   const api = apisauce.create({
     // base URL is read from the "constructor"
-    baseURL,
+    baseURL: `https://api.staging-sm.com/v2/analytics/${accountId}`,
     // here are some default headers
     headers: {
       'Content-Type': 'application/vnd.api+json;charset=UTF-8',
-      'Authorization': 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6InNicmVuZGVyQHNpbXBseW1lYXN1cmVkLmNvbSIsImFwcF9tZXRhZGF0YSI6eyJpc19zbV9hZG1pbiI6dHJ1ZSwiYXBpX2FjY2VzcyI6dHJ1ZX0sInVzZXJfbWV0YWRhdGEiOnsicHJvZmlsZV9pbWFnZSI6Imh0dHBzOi8vcy5ncmF2YXRhci5jb20vYXZhdGFyLzMyYWVjN2UxNTVjNjU4YmQ0MTkxZGFiZTFmOTE5NmY0P3M9NDgwJnI9cGcmZD1odHRwcyUzQSUyRiUyRmNkbi5hdXRoMC5jb20lMkZhdmF0YXJzJTJGc2IucG5nIiwiZW1haWwiOiJzYnJlbmRlckBzaW1wbHltZWFzdXJlZC5jb20iLCJmaXJzdF9uYW1lIjoiU2FtYW50aGEg8J-QmSIsImxhc3RfbmFtZSI6IkJyZW5kZXIifSwiZW1haWxfdmVyaWZpZWQiOnRydWUsImNsaWVudElEIjoiWXdEWTlENDMzdmVNSENyZWQ3ajBCRVNqbG53RjdyeTgiLCJ1cGRhdGVkX2F0IjoiMjAxNy0wMS0wM1QxOTo1Mjo0Mi4wODdaIiwidXNlcl9pZCI6ImF1dGgwfGM1MzYxYmQ3LTFiZGEtNGY1Yi05YzI5LTRmOTA2ZTIzZjJmNyIsImlkZW50aXRpZXMiOlt7InVzZXJfaWQiOiJjNTM2MWJkNy0xYmRhLTRmNWItOWMyOS00ZjkwNmUyM2YyZjciLCJwcm92aWRlciI6ImF1dGgwIiwiY29ubmVjdGlvbiI6IlVBTURCIiwiaXNTb2NpYWwiOmZhbHNlfV0sImNyZWF0ZWRfYXQiOiIyMDE2LTAzLTI5VDIwOjU3OjIyLjAyMFoiLCJpc3MiOiJodHRwczovL3NpbXBseW1lYXN1cmVkLmF1dGgwLmNvbS8iLCJzdWIiOiJhdXRoMHxjNTM2MWJkNy0xYmRhLTRmNWItOWMyOS00ZjkwNmUyM2YyZjciLCJhdWQiOiJZd0RZOUQ0MzN2ZU1IQ3JlZDdqMEJFU2psbndGN3J5OCIsImV4cCI6MTQ4Mzk3MzE2MywiaWF0IjoxNDgzNDczMTYzfQ.B-2mk_VI3zDsZA3rfjD3KOemCAHPUb1ELFG8qnETyDc'
+      'Authorization': `Bearer ${token}`
     },
     // 10 second timeout...
     timeout: 10000
