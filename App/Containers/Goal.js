@@ -1,8 +1,7 @@
 // @flow
 
 import React from 'react'
-import { View, ScrollView, Text, KeyboardAvoidingView, TextInput, ListView, TouchableHighlight, Alert, AsyncStorage } from 'react-native'
-import Reactotron from 'reactotron-react-native'
+import { View, Text, ListView, TouchableHighlight, AsyncStorage } from 'react-native'
 import { Actions } from 'react-native-router-flux'
 
 // Styles
@@ -19,8 +18,8 @@ export default class Goal extends React.Component {
       dataSource: ds.cloneWithRows([])
     }
   }
-  
-  populateListWithAccounts() {
+
+  populateListWithAccounts () {
     AsyncStorage.getItem('userAccounts', (err, value) => {
       if (err !== null) {
         console.tron.log(String(error))
@@ -33,7 +32,7 @@ export default class Goal extends React.Component {
       this.setState({dataSource: ds.cloneWithRows(accounts)})
     })
   }
-  
+
   componentDidMount () {
     this.populateListWithAccounts()
   }
@@ -41,7 +40,7 @@ export default class Goal extends React.Component {
   rowWasTapped(rowID) {
     AsyncStorage.setItem('selectedAccount', rowID, (err, value) => {
       if (err !== null) {
-        console.tron.log(String(error))
+        console.tron.log(String(err))
         return
       }
 
@@ -49,7 +48,7 @@ export default class Goal extends React.Component {
     })
   }
   
-  _renderRow(rowData, sectionID, rowID, highlightRow) {
+  _renderRow (rowData, sectionID, rowID, highlightRow) {
     return (
       <TouchableHighlight
         underlayColor='#6088E0'
