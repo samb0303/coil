@@ -22,7 +22,9 @@ const colors = {
   drawer: 'rgba(30, 30, 29, 0.95)',
   smLightGray: '#9fa2a3',
   smDarkGray: 'rgb(74, 79, 85)',
-  smBlue: '#6088E0'
+  smBlue: '#6088E0',
+  smGreen: '#5ac63b',
+  smRed: 'rgba(200, 0, 0, 0.8)'
 }
 
 export default colors

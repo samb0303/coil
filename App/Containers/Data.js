@@ -24,6 +24,8 @@ import DatePicker from 'react-native-datepicker'
 import moment from 'moment'
 import update from 'immutability-helper'
 import Icon from 'react-native-vector-icons/FontAwesome'
+import { FormattedNumber, FormattedCurrency } from 'react-native-globalize'
+import numeral from 'numeral'
 
 class Data extends React.Component {
   state: {
@@ -184,15 +186,15 @@ class Data extends React.Component {
     return (
       <ScrollView style={styles.mainContainer} ref='container'>
         <KeyboardAvoidingView behavior='position'>
-          <Text>
-            {moment(this.state.startDate).format('MMM D, YYYY')} - {moment(this.state.endDate).format('MMM D, YYYY')}
-          </Text>
-          <Text>
-            VS. {moment(this.state.comparisonStartDate).format('MMM D, YYYY')} - {moment(this.state.comparisonEndDate).format('MMM D, YYYY')}
-          </Text>
-          <View style={styles.datePickers}>
-            <TheDatePicker ref='start-date' dateChanged={this.startDateChanged} date={this.state.startDate} />
-            <TheDatePicker ref='end-date' dateChanged={this.endDateChanged} date={this.state.endDate} />
+          <View style={styles.dateContainer}>
+            <View style={styles.datePickers}>
+              <TheDatePicker ref='start-date' dateChanged={this.startDateChanged} date={this.state.startDate} />
+              <Text style={styles.deltaPercentage}>TO</Text>
+              <TheDatePicker ref='end-date' dateChanged={this.endDateChanged} date={this.state.endDate} />
+            </View>
+            <Text style={styles.vs}>
+              VS. {moment(this.state.comparisonStartDate).format('MMM D, YYYY')} - {moment(this.state.comparisonEndDate).format('MMM D, YYYY')}
+            </Text>
           </View>
           <APIResult ref='result' metrics={this.state.metrics} channelMetrics={this.state.channelMetrics} deltaPercentages={this.state.deltaPercentages} />
         </KeyboardAvoidingView>
@@ -222,91 +224,190 @@ class APIResult extends React.Component {
     }
   }
 
-  getGoalCompletions () {
-    if (this.props.metrics) {
-      return FJSON.plain(this.props.metrics['goal_completions'])
+  getMetric (metric) {
+    const metricValue = this.props.metrics[metric]
+
+    if (!metricValue) {
+      return '--'
+    }
+    if (metric === 'business_value' || metric === 'revenue') {
+      return numeral(metricValue).format('($ 0.00 a)')
+    } else {
+      return numeral(metricValue).format('(0 a)')
     }
   }
 
-  getGoalCompletionsPercentage () {
-    if (this.props.deltaPercentages) {
-      return FJSON.plain(this.props.deltaPercentages['goal_completions'])
+  getFormattedMetric (metric) {
+    const metricValue = this.getMetric(metric)
+
+    return (
+      <Text style={styles.metric}>{metricValue}</Text>
+    )
+  }
+
+  getFormattedPercentage (metric) {
+    const percentage = this.getPercentage(metric)
+
+    return (
+      <Text style={styles.percentage}>{percentage}</Text>
+    )
+  }
+
+  getPercentage (metric) {
+    const metricValue = this.props.deltaPercentages[metric]
+
+    if (!metricValue) {
+      return '--'
+    }
+    return numeral(metricValue / 100).format('0 %')
+  }
+
+  getChannelMetic (metric, channel) {
+    return this.props.channelMetrics[channel][metric]
+  }
+
+  getPercentageIcon (metric) {
+    const percentage = this.getPercentage(metric)
+
+    if (percentage > 0) {
+      return (
+        <Icon name='caret-up' size={Metrics.icons.small} color={Colors.smGreen} style={styles.percentageIcon} />
+      )
+    } else {
+      return (
+        <Icon name='caret-down' size={Metrics.icons.small} color={Colors.smRed} style={styles.percentageIcon} />
+      )
     }
   }
 
-  getVisits () {
-    if (this.props.metics) {
-      return FJSON.plain(this.props.metrics['visits'])
+  getChannelIcon (channel) {
+    if (channel === 'dark_social') {
+      return (
+        <Icon name='commenting' key={`${channel}-icon`} size={Metrics.icons.medium} color={Colors.smBlue} />
+      )
     }
-  }
 
-  getRevenue () {
-    if (this.props.metrics) {
-      return FJSON.plain(this.props.metrics['revenue'])
+    if (channel === 'youtube') {
+      return (
+        <Icon name='youtube-play' key={`${channel}-icon`} size={Metrics.icons.medium} color={Colors.smBlue} />
+      )
     }
-  }
 
-  getBusinessValue () {
-    if (this.props.metrics) {
-      return FJSON.plain(this.props.metrics['business_value'])
-    }
-  }
-
-  getChannelGoalCompletions (channel) {
-    if (this.props.channelMetrics['facebook']) {
-      return this.props.channelMetrics[channel]['goal_completions']
-    }
+    return (
+      <Icon name={channel} key={`${channel}-icon`} size={Metrics.icons.medium} color={Colors.smBlue} />
+    )
   }
 
   renderView () {
     return (
       <View>
-        <Text style={styles.metricHeader}>
-          GOAL COMPLETIONS
-        </Text>
-        <Text style={styles.metric}>
-          {this.getGoalCompletions()}
-        </Text>
+        <View style={styles.metricsContainer}>
+          <Text style={styles.metricHeader}>
+            GOAL COMPLETIONS
+          </Text>
+          <View style={styles.metrics}>
+            {this.getFormattedMetric('goal_completions')}
 
-        <Text style={styles.metric}>
-          {this.getGoalCompletionsPercentage()}
-        </Text>
-
-        { Object.keys(this.props.channelMetrics).map(function (channel) {
-          let iconName = channel
-          if (channel === 'dark_social') {
-            iconName = 'commenting'
-          }
-          return (
-            <View style={styles.channelMetric} key={`${channel}-info`}>
-              <Icon name={iconName} key={`${channel}-icon`} size={Metrics.icons.medium} color={Colors.smBlue} />
-              <Text style={styles.metric} key={`${channel}-metric`}>
-                {this.getChannelGoalCompletions(channel)}
-              </Text>
+            <View style={styles.deltaPercentage}>
+              {this.getPercentageIcon('goal_completions')}
+              {this.getFormattedPercentage('goal_completions')}
             </View>
-          )
-        }, this)}
+          </View>
 
-        <Text style={styles.metricHeader}>
-          VISITS
-        </Text>
-        <Text style={styles.metric}>
-          {this.getVisits()}
-        </Text>
+          <View style={styles.channelMetrics}>
+            { Object.keys(this.props.channelMetrics).map(function (channel) {
+              return (
+                <View style={styles.channelMetric} key={`${channel}-info`}>
+                  {this.getChannelIcon(channel)}
+                  <Text key={`${channel}-metric`}>
+                    {this.getChannelMetic('goal_completions', channel)}
+                  </Text>
+                </View>
+              )
+            }, this)}
+          </View>
+        </View>
 
-        <Text style={styles.metricHeader}>
-          REVENUE
-        </Text>
-        <Text style={styles.metric}>
-          {this.getRevenue()}
-        </Text>
+        <View style={styles.metricsContainer}>
+          <Text style={styles.metricHeader}>
+            VISITS
+          </Text>
+          <View style={styles.metrics}>
+            {this.getFormattedMetric('visits')}
 
-        <Text style={styles.metricHeader}>
-          BUSINESS VALUE
-        </Text>
-        <Text style={styles.metric}>
-          {this.getBusinessValue()}
-        </Text>
+            <View style={styles.deltaPercentage}>
+              {this.getPercentageIcon('visits')}
+              {this.getFormattedPercentage('visits')}
+            </View>
+          </View>
+
+          <View style={styles.channelMetrics}>
+            { Object.keys(this.props.channelMetrics).map(function (channel) {
+              return (
+                <View style={styles.channelMetric} key={`${channel}-info`}>
+                  {this.getChannelIcon(channel)}
+                  <Text key={`${channel}-metric`}>
+                    {this.getChannelMetic('visits', channel)}
+                  </Text>
+                </View>
+              )
+            }, this)}
+          </View>
+        </View>
+
+        <View style={styles.metricsContainer}>
+          <Text style={styles.metricHeader}>
+            REVENUE
+          </Text>
+          <View style={styles.metrics}>
+            {this.getFormattedMetric('revenue')}
+
+            <View style={styles.deltaPercentage}>
+              {this.getPercentageIcon('revenue')}
+              {this.getFormattedPercentage('revenue')}
+            </View>
+          </View>
+
+          <View style={styles.channelMetrics}>
+            { Object.keys(this.props.channelMetrics).map(function (channel) {
+              return (
+                <View style={styles.channelMetric} key={`${channel}-info`}>
+                  {this.getChannelIcon(channel)}
+                  <Text key={`${channel}-metric`}>
+                    {this.getChannelMetic('revenue', channel)}
+                  </Text>
+                </View>
+              )
+            }, this)}
+          </View>
+        </View>
+
+        <View style={styles.metricsContainer}>
+          <Text style={styles.metricHeader}>
+            BUSINESS VALUE
+          </Text>
+          <View style={styles.metrics}>
+            {this.getFormattedMetric('business_value')}
+
+            <View style={styles.deltaPercentage}>
+              {this.getPercentageIcon('business_value')}
+              {this.getFormattedPercentage('business_value')}
+            </View>
+          </View>
+
+          <View style={styles.channelMetrics}>
+            { Object.keys(this.props.channelMetrics).map(function (channel) {
+              return (
+                <View style={styles.channelMetric} key={`${channel}-info`}>
+                  {this.getChannelIcon(channel)}
+                  <Text key={`${channel}-metric`}>
+                    {this.getChannelMetic('business_value', channel)}
+                  </Text>
+                </View>
+              )
+            }, this)}
+          </View>
+        </View>
       </View>
     )
   }
@@ -314,7 +415,7 @@ class APIResult extends React.Component {
   render () {
     let messageView = null
     // console.tron.log(`CHANNEL DATA PROPS: ${FJSON.plain(this.props.channelMetrics)}`)
-    // console.tron.log('KEYS:', Object.keys(this.props.channelMetrics))
+    console.tron.log(`METRICS: ${FJSON.plain(this.props.metrics)}`)
 
     if (this.props.metrics) {
       return this.renderView()
@@ -329,7 +430,7 @@ export class TheDatePicker extends React.Component {
   render () {
     return (
       <DatePicker
-        style={{width: 200}}
+        style={{width: 150}}
         date={this.props.date}
         mode='date'
         placeholder='select date'
@@ -343,24 +444,21 @@ export class TheDatePicker extends React.Component {
             marginLeft: 0
           },
           dateInput: {
-            // marginLeft: 20,
             marginRight: 0,
             borderRadius: 4,
             width: 50
           },
           dateText: {
-            color: Colors.smLightGray
+            color: Colors.smDarkGray
           },
           datePickerMask: {
             display: 'inline',
             backgroundColor: Colors.smDarkGray
           },
           dateTouchBody: {
-            // backgroundColor: Colors.smDarkGray,
             width: 150
           },
           dateTouch: {
-            width: 100
           }
         }}
         onDateChange={(date) => { this.props.dateChanged(date) }}

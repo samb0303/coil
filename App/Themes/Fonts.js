@@ -7,7 +7,7 @@ const type = {
 }
 
 const size = {
-  h1: 38,
+  h1: 43,
   h2: 34,
   h3: 30,
   h4: 26,
