@@ -7,11 +7,6 @@ target 'coil' do
 
   # Pods for coil
 
-  target 'coilTests' do
-    inherit! :search_paths
-    # Pods for testing
-  end
-
 end
 
 # Auth0 Lock
