@@ -9,6 +9,8 @@ import styles from './Styles/GoalStyle'
 
 const ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2})
 
+const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
+
 export default class Goal extends React.Component {
 
   constructor (props) {
@@ -27,7 +29,12 @@ export default class Goal extends React.Component {
       }
 
       var accounts = {}
-      JSON.parse(value).forEach((account) => (accounts[account.id] = account.name))
+      
+      JSON.parse(value).forEach((account) => {
+        if (account.name.match(uuidRegex) == null && account.name.match(/Freebies/) == null) {
+          (accounts[account.id] = account.name)
+        }
+      })
 
       this.setState({dataSource: ds.cloneWithRows(accounts)})
     })
@@ -70,7 +77,7 @@ export default class Goal extends React.Component {
 
   render () {
     return (
-      <View style={{flex: 1, paddingTop: 52}}>
+      <View style={{flex: 1, paddingTop: 55}}>
         <ListView
           enableEmptySections={true}
           dataSource={this.state.dataSource}
