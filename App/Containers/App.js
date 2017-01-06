@@ -6,6 +6,7 @@ import '../I18n/I18n' // keep before root container
 import RootContainer from './RootContainer'
 import createStore from '../Redux'
 import applyConfigSettings from '../Config'
+import { FormattedWrapper } from 'react-native-globalize'
 
 // Apply config overrides
 applyConfigSettings()
@@ -24,9 +25,12 @@ const store = createStore()
 class App extends Component {
   render () {
     return (
-      <Provider store={store}>
-        <RootContainer />
-      </Provider>
+      <FormattedWrapper locale='en' currency='USD'>
+        <Provider store={store}>
+          <RootContainer />
+        </Provider>
+      </FormattedWrapper>
+
     )
   }
 }
