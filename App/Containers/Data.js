@@ -22,46 +22,59 @@ import FJSON from 'format-json'
 
 import DatePicker from 'react-native-datepicker'
 import moment from 'moment'
+import update from 'immutability-helper'
+import Icon from 'react-native-vector-icons/FontAwesome'
 
 class Data extends React.Component {
   state: {
     visibleHeight: number,
-    title: string,
-    startDate: Date
+    title: string
   }
 
   constructor (props: Object) {
     super(props)
 
+    const endDate = moment()
+    const startDate = endDate.clone().subtract(1, 'month')
+    const diff = endDate.diff(startDate, 'days')
+
+    const comparisonStartDate = startDate.clone().subtract(diff, 'days')
+    const comparisonEndDate = endDate.clone().subtract(diff, 'days')
+
     this.state = {
       visibleHeight: Metrics.screenHeight,
       title: 'hey',
       data: [],
-      startDate: '2016-05-15',
-      endDate: '2016-06-15',
-      metrics: {}
+      startDate: startDate.format('YYYY-MM-DD'),
+      endDate: endDate.format('YYYY-MM-DD'),
+      comparisonStartDate: comparisonStartDate.format('YYYY-MM-DD'),
+      comparisonEndDate: comparisonEndDate.format('YYYY-MM-DD'),
+      metrics: {},
+      channelMetrics: {},
+      deltaPercentages: {}
     }
 
     this.api = API.create()
 
     this.startDateChanged = this.startDateChanged.bind(this)
     this.endDateChanged = this.endDateChanged.bind(this)
-
-    // this.getData()
+    this.getComparisonDates = this.getComparisonDates.bind(this)
   }
 
   componentDidMount () {
+    // this.setComparisonDates()
     this.getData()
+    this.getChannelData()
   }
 
   getData () {
-    console.tron.log(`Start Date: ${this.state.startDate}`)
-    console.tron.log(`End Date: ${this.state.endDate}`)
+    // console.tron.log(`Get Data Start Date: ${this.state.startDate}`)
+    // console.tron.log(`End Date: ${this.state.endDate}`)
 
     const filters = {
       'tz': ['America/Los_Angeles'],
       'filter': ['session.referrer_channel_type.eq(social)', 'session.referrer_channel.eq(dark_social,facebook,instagram,pinterest,twitter,youtube)', 'session.driving_domain_id.neq(38,39)'],
-      'period': [`session.start_time.in(${moment(this.state.startDate).utc().format()}...${moment(this.state.endDate).utc().format()}).vs(${moment(this.state.startDate).utc().format()}...${moment(this.state.endDate).utc().format()})`],
+      'period': [`session.start_time.in(${moment(this.state.startDate).utc().format()}...${moment(this.state.endDate).utc().format()}).vs(${moment(this.state.comparisonStartDate).utc().format()}...${moment(this.state.comparisonEndDate).utc().format()})`],
       'metrics': ['session.duration.per(session.count).as(average_time_on_site),conversion.revenue.per(conversion.purchases_count).as(average_order_value),session.bounces_count.per(session.count).as(bounce_rate),conversion.business_value.as(business_value),conversion.count.as(goal_completions),conversion.unique_converters.per(session.unique_visits).as(goal_completion_rate),conversion.purchases_count.as(purchases),conversion.unique_purchasers.per(session.unique_visits).as(purchase_conversion_rate),conversion.items_count.per(conversion.purchases_count).as(items_per_purchase),session.pageviews.as(pageviews),conversion.revenue.as(revenue),session.count.as(visits),session.unique_pageviews.as(unique_pageviews),session.unique_pageviews.per(session.unique_visits).as(unique_pageviews_per_unique_visits),session.unique_visits.as(unique_visits)']
     }
 
@@ -71,51 +84,121 @@ class Data extends React.Component {
     })
   }
 
-  startDateChanged (date) {
-    console.tron.log(`Start Date Changed ${date}`)
-    this.setState({startDate: date})
-    this.getData()
+  getChannelData () {
+    const filters = {
+      'tz': ['America/Los_Angeles'],
+      'filter': ['session.referrer_channel_type.eq(social)', `session.start_time.gte(${this.state.startDate}).lt(${this.state.endDate})`, 'session.referrer_channel.eq(dark_social,facebook,instagram,pinterest,twitter,youtube)', 'session.driving_domain_id.neq(38,39)'],
+      'metrics': ['session.duration.per(session.count).as(average_time_on_site),conversion.revenue.per(conversion.purchases_count).as(average_order_value),session.bounces_count.per(session.count).as(bounce_rate),conversion.business_value.as(business_value),conversion.count.as(goal_completions),conversion.unique_converters.per(session.unique_visits).as(goal_completion_rate),conversion.purchases_count.as(purchases),conversion.unique_purchasers.per(session.unique_visits).as(purchase_conversion_rate),conversion.items_count.per(conversion.purchases_count).as(items_per_purchase),session.pageviews.as(pageviews),conversion.revenue.as(revenue),session.count.as(visits),session.unique_pageviews.as(unique_pageviews),session.unique_pageviews.per(session.unique_visits).as(unique_pageviews_per_unique_visits),session.unique_visits.as(unique_visits)'],
+      'dimensions': ['session.referrer_channel']
+    }
+
+    this.api['getData'](filters).then((result) => {
+      this.showChannelResult(result, 'Result')
+    })
   }
 
-  endDateChanged (date) {
-    console.tron.log(`End Date Changed ${date}`)
-    this.setState({endDate: date})
-    this.getData()
+  showChannelResult (response: Object, title: string = 'Response') {
+    // this.refs.container.scrollTo({x: 0, y: 0, animated: true})
+    if (response.ok) {
+      // console.tron.log(`CHANNEL DATA: ${FJSON.plain(response.data['data'])}`)
+
+      const data = response.data['data']
+
+      // const channelData = []
+
+      // const channelMetrics = this.state.channelMetrics.slice()
+
+      data.forEach((metric) => {
+        // const result = {}
+        const channelMetric = {}
+        const channel = metric.attributes.dimensions['session.referrer_channel']
+        const goalCompletions = metric.attributes.metrics['goal_completions']
+        const visits = metric.attributes.metrics['visits']
+        const revenue = metric.attributes.metrics['revenue']
+        const businessValue = metric.attributes.metrics['business_value']
+
+        channelMetric[channel] = {
+          'goal_completions': goalCompletions,
+          'visits': visits,
+          'revenue': revenue,
+          'business_value': businessValue
+        }
+
+        const newChannelMetrics = update(this.state.channelMetrics, {$merge: channelMetric})
+
+        this.setState({ channelMetrics: newChannelMetrics })
+      })
+      // console.tron.log(`CHANNEL DATA: ${FJSON.plain(this.state.channelMetrics)}`)
+      // this.setState({ channelMetrics: channelMetrics })
+    } else {
+      this.refs.container.setState({result: `${response.problem} - ${response.status}`})
+    }
   }
 
   showResult (response: Object, title: string = 'Response') {
     // this.refs.container.scrollTo({x: 0, y: 0, animated: true})
     if (response.ok) {
-      console.tron.log(`DATA: ${FJSON.plain(response.data['data'][0])}`)
+      // console.tron.log(`DATA: ${FJSON.plain(response.data['data'][0])}`)
 
       const data = response.data['data'][0].attributes
       const metrics = data.metrics
+      const deltaPercentages = data['delta_percentages']
 
-      this.setState({ metrics: metrics })
-      // this.refs.result.setState({
-      //   metrics: metrics,
-      //   dataValues: dataValues
-      // })
+      this.setState({ metrics: metrics, deltaPercentages: deltaPercentages })
     } else {
       this.refs.container.setState({result: `${response.problem} - ${response.status}`})
     }
+  }
+
+  startDateChanged (date) {
+    const [comparisonStartDate, comparisonEndDate] = this.getComparisonDates(date, this.state.endDate)
+
+    this.setState({startDate: date, comparisonStartDate: comparisonStartDate, comparisonEndDate: comparisonEndDate}, function () {
+      this.getData()
+      this.getChannelData()
+    })
+  }
+
+  endDateChanged (date) {
+    const [comparisonStartDate, comparisonEndDate] = this.getComparisonDates(this.state.startDate, date)
+
+    this.setState({endDate: date, comparisonStartDate: comparisonStartDate, comparisonEndDate: comparisonEndDate}, function () {
+      this.getData()
+      this.getChannelData()
+    })
+  }
+
+  getComparisonDates (startDate, endDate) {
+    const momentStartDate = moment(startDate)
+    const momentEndDate = moment(endDate)
+
+    const diff = momentEndDate.diff(momentStartDate, 'days')
+
+    const comparisonStartDate = momentStartDate.clone().subtract(diff, 'days').format('YYYY-MM-DD')
+    const comparisonEndDate = momentEndDate.clone().subtract(diff, 'days').format('YYYY-MM-DD')
+
+    return [comparisonStartDate, comparisonEndDate]
   }
 
   render () {
     return (
       <ScrollView style={styles.mainContainer} ref='container'>
         <KeyboardAvoidingView behavior='position'>
+          <Text>
+            {moment(this.state.startDate).format('MMM D, YYYY')} - {moment(this.state.endDate).format('MMM D, YYYY')}
+          </Text>
+          <Text>
+            VS. {moment(this.state.comparisonStartDate).format('MMM D, YYYY')} - {moment(this.state.comparisonEndDate).format('MMM D, YYYY')}
+          </Text>
           <View style={styles.datePickers}>
-
             <TheDatePicker ref='start-date' dateChanged={this.startDateChanged} date={this.state.startDate} />
             <TheDatePicker ref='end-date' dateChanged={this.endDateChanged} date={this.state.endDate} />
           </View>
-          <APIResult ref='result' metrics={this.state.metrics} />
+          <APIResult ref='result' metrics={this.state.metrics} channelMetrics={this.state.channelMetrics} deltaPercentages={this.state.deltaPercentages} />
         </KeyboardAvoidingView>
       </ScrollView>
     )
   }
-
 }
 
 const mapStateToProps = (state) => {
@@ -132,10 +215,6 @@ export default connect(mapStateToProps, mapDispatchToProps)(Data)
 
 class APIResult extends React.Component {
 
-  // state: {
-  //   result: Array,
-  // }
-
   constructor (props) {
     super(props)
     this.state = {
@@ -146,6 +225,12 @@ class APIResult extends React.Component {
   getGoalCompletions () {
     if (this.props.metrics) {
       return FJSON.plain(this.props.metrics['goal_completions'])
+    }
+  }
+
+  getGoalCompletionsPercentage () {
+    if (this.props.deltaPercentages) {
+      return FJSON.plain(this.props.deltaPercentages['goal_completions'])
     }
   }
 
@@ -167,6 +252,12 @@ class APIResult extends React.Component {
     }
   }
 
+  getChannelGoalCompletions (channel) {
+    if (this.props.channelMetrics['facebook']) {
+      return this.props.channelMetrics[channel]['goal_completions']
+    }
+  }
+
   renderView () {
     return (
       <View>
@@ -176,14 +267,45 @@ class APIResult extends React.Component {
         <Text style={styles.metric}>
           {this.getGoalCompletions()}
         </Text>
-        <Text style={{fontFamily: 'CourierNewPS-BoldMT', fontSize: 10}}>
-          Visits: {this.getVisits()}
+
+        <Text style={styles.metric}>
+          {this.getGoalCompletionsPercentage()}
         </Text>
-        <Text style={{fontFamily: 'CourierNewPS-BoldMT', fontSize: 10}}>
-          Revenue: {this.getRevenue()}
+
+        { Object.keys(this.props.channelMetrics).map(function (channel) {
+          let iconName = channel
+          if (channel === 'dark_social') {
+            iconName = 'commenting'
+          }
+          return (
+            <View style={styles.channelMetric} key={`${channel}-info`}>
+              <Icon name={iconName} key={`${channel}-icon`} size={Metrics.icons.medium} color={Colors.smBlue} />
+              <Text style={styles.metric} key={`${channel}-metric`}>
+                {this.getChannelGoalCompletions(channel)}
+              </Text>
+            </View>
+          )
+        }, this)}
+
+        <Text style={styles.metricHeader}>
+          VISITS
         </Text>
-        <Text style={{fontFamily: 'CourierNewPS-BoldMT', fontSize: 10}}>
-          Business Value: {this.getBusinessValue()}
+        <Text style={styles.metric}>
+          {this.getVisits()}
+        </Text>
+
+        <Text style={styles.metricHeader}>
+          REVENUE
+        </Text>
+        <Text style={styles.metric}>
+          {this.getRevenue()}
+        </Text>
+
+        <Text style={styles.metricHeader}>
+          BUSINESS VALUE
+        </Text>
+        <Text style={styles.metric}>
+          {this.getBusinessValue()}
         </Text>
       </View>
     )
@@ -191,6 +313,9 @@ class APIResult extends React.Component {
 
   render () {
     let messageView = null
+    // console.tron.log(`CHANNEL DATA PROPS: ${FJSON.plain(this.props.channelMetrics)}`)
+    // console.tron.log('KEYS:', Object.keys(this.props.channelMetrics))
+
     if (this.props.metrics) {
       return this.renderView()
     }

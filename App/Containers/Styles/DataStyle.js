@@ -23,8 +23,14 @@ export default StyleSheet.create({
 
   metric: {
     alignSelf: 'center',
-    fontSize: Fonts.size.h4,
+    fontSize: Fonts.size.h2,
     marginVertical: Metrics.baseMargin,
     color: Colors.smDarkGray
+  },
+
+  channelMetric: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center'
   }
 })

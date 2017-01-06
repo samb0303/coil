@@ -21,7 +21,8 @@ const colors = {
   fire: '#e73536',
   drawer: 'rgba(30, 30, 29, 0.95)',
   smLightGray: '#9fa2a3',
-  smDarkGray: 'rgb(74, 79, 85)'
+  smDarkGray: 'rgb(74, 79, 85)',
+  smBlue: '#6088E0'
 }
 
 export default colors
