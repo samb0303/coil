@@ -2,10 +2,12 @@
 
 import React, { Component } from 'react'
 import { Scene, Router } from 'react-native-router-flux'
+import { AsyncStorage } from 'react-native'
 import Styles from './Styles/NavigationContainerStyle'
 import NavigationDrawer from './NavigationDrawer'
 import NavItems from './NavItems'
 import CustomNavBar from '../Navigation/CustomNavBar'
+// import Reactotron from 'reactotron-react-native'
 
 // screens identified by the router
 import PresentationScreen from '../Containers/PresentationScreen'
@@ -29,13 +31,30 @@ import GoalScreen from '../Containers/Goal'
 ***************************/
 
 class NavigationRouter extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      initialRoute: <Scene initial key='auth0Lock' component={Auth0Lock} title='Login' navigator={navigator} />,
+      mundaneRoute: <Scene initial key='goalScreen' component={GoalScreen} title='Goals' navigator={navigator} />
+   }
+  }
+
+  componentWillMount() {
+    let userLoggedIn = this.props.userLoggedIn;
+
+    if (userLoggedIn) {
+      this.setState({ initialRoute: <Scene initial key='goalScreen' component={GoalScreen} navigator={navigator} title='Set A Goal' /> })
+      this.setState({ mundaneRoute: '' })
+    }
+  }
+
   render () {
     return (
       <Router>
         <Scene key='drawer' component={NavigationDrawer} open={false}>
           <Scene key='drawerChildrenWrapper' navigationBarStyle={Styles.navBar} titleStyle={Styles.title} leftButtonIconStyle={Styles.leftButton} rightButtonTextStyle={Styles.rightButton}>
-            <Scene initial key='auth0Lock' component={Auth0Lock} title='Login' navigator={navigator} />
-            <Scene key='goalScreen' component={GoalScreen} title='Set A Goal' />
+            {this.state.initialRoute}
+            {this.state.mundaneRoute}
             <Scene key='componentExamples' component={AllComponentsScreen} title='Components' />
             <Scene key='usageExamples' component={UsageExamplesScreen} title='Usage' rightTitle='Example' onRight={() => window.alert('Example Pressed')} />
             <Scene key='login' component={LoginScreen} title='Login' hideNavBar />

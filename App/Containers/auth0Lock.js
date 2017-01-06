@@ -34,14 +34,15 @@ export default class auth0Lock extends React.Component {
     })
     lock.show({}, (err, profile, token) => {
       if (err) {
-        Reactotron.log(err);
+        Reactotron.log(String(err));
         return;
       }
       // Authentication worked!
       try {
-        AsyncStorage.multiSet([['userProfile', JSON.parse(profile)], ['userToken', JSON.parse(token)]]);
+        AsyncStorage.multiSet([['userProfile', JSON.stringify(profile)], ['userToken', JSON.stringify(token)]]);
       } catch (error) {
-        console.tron.log(error);
+        Reactotron.log(String(error));
+        return;
       }
 
       fetch(`https://api.staging-sm.com/v2/users/${profile.identities[0].userId}/assigned-permissions?include[assigned-permissions]=account`, {
@@ -52,15 +53,15 @@ export default class auth0Lock extends React.Component {
       })
         .then((response) => response.json())
         .then((responseJson) => {
-          AsyncStorage.setItem('userAccounts', JSON.parse(responseJson.included.map((item) => {
+          AsyncStorage.setItem('userAccounts', JSON.stringify(responseJson.included.map((item) => {
             return {
               name: item.attributes.name,
               id: item.id
             }
-          })));
+          })))
         })
-        .catch((error) => console.tron.log(error))
-      Actions.goalScreen();
+        .then(() => Actions.goalScreen())
+        .catch((error) => Reactotron.log(String(error)))
     });
   }
   render () {
