@@ -100,15 +100,8 @@ class Data extends React.Component {
   }
 
   showChannelResult (response: Object, title: string = 'Response') {
-    // this.refs.container.scrollTo({x: 0, y: 0, animated: true})
     if (response.ok) {
-      // console.tron.log(`CHANNEL DATA: ${FJSON.plain(response.data['data'])}`)
-
       const data = response.data['data']
-
-      // const channelData = []
-
-      // const channelMetrics = this.state.channelMetrics.slice()
 
       data.forEach((metric) => {
         // const result = {}
@@ -118,20 +111,22 @@ class Data extends React.Component {
         const visits = metric.attributes.metrics['visits']
         const revenue = metric.attributes.metrics['revenue']
         const businessValue = metric.attributes.metrics['business_value']
+        const purchases = metric.attributes.metrics['purchases']
+        const pageviews = metric.attributes.metrics['pageviews']
 
         channelMetric[channel] = {
           'goal_completions': goalCompletions,
           'visits': visits,
           'revenue': revenue,
-          'business_value': businessValue
+          'business_value': businessValue,
+          'purchases': purchases,
+          'pageviews': pageviews
         }
 
         const newChannelMetrics = update(this.state.channelMetrics, {$merge: channelMetric})
 
         this.setState({ channelMetrics: newChannelMetrics })
       })
-      // console.tron.log(`CHANNEL DATA: ${FJSON.plain(this.state.channelMetrics)}`)
-      // this.setState({ channelMetrics: channelMetrics })
     } else {
       this.refs.container.setState({result: `${response.problem} - ${response.status}`})
     }
@@ -302,6 +297,60 @@ class APIResult extends React.Component {
   renderView () {
     return (
       <View>
+        <View style={styles.metricsContainer}>
+          <Text style={styles.metricHeader}>
+            PURCHASES
+          </Text>
+          <View style={styles.metrics}>
+            {this.getFormattedMetric('purchases')}
+
+            <View style={styles.deltaPercentage}>
+              {this.getPercentageIcon('purchases')}
+              {this.getFormattedPercentage('purchases')}
+            </View>
+          </View>
+
+          <View style={styles.channelMetrics}>
+            { Object.keys(this.props.channelMetrics).map(function (channel) {
+              return (
+                <View style={styles.channelMetric} key={`${channel}-info`}>
+                  {this.getChannelIcon(channel)}
+                  <Text key={`${channel}-metric`} style={styles.channelMetricValue}>
+                    {this.getChannelMetic('purchases', channel)}
+                  </Text>
+                </View>
+              )
+            }, this)}
+          </View>
+        </View>
+
+        <View style={styles.metricsContainer}>
+          <Text style={styles.metricHeader}>
+            PAGE VIEWS
+          </Text>
+          <View style={styles.metrics}>
+            {this.getFormattedMetric('pageviews')}
+
+            <View style={styles.deltaPercentage}>
+              {this.getPercentageIcon('pageviews')}
+              {this.getFormattedPercentage('pageviews')}
+            </View>
+          </View>
+
+          <View style={styles.channelMetrics}>
+            { Object.keys(this.props.channelMetrics).map(function (channel) {
+              return (
+                <View style={styles.channelMetric} key={`${channel}-info`}>
+                  {this.getChannelIcon(channel)}
+                  <Text key={`${channel}-metric`} style={styles.channelMetricValue}>
+                    {this.getChannelMetic('pageviews', channel)}
+                  </Text>
+                </View>
+              )
+            }, this)}
+          </View>
+        </View>
+
         <View style={styles.metricsContainer}>
           <Text style={styles.metricHeader}>
             GOAL COMPLETIONS
