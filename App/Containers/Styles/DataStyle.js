@@ -85,5 +85,9 @@ export default StyleSheet.create({
 
   channelMetricItem: {
     padding: 10
+  },
+
+  channelMetricValue: {
+    color: Colors.smLightGray
   }
 })

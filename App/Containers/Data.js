@@ -263,7 +263,7 @@ class APIResult extends React.Component {
   }
 
   getChannelMetic (metric, channel) {
-    return this.props.channelMetrics[channel][metric]
+    return numeral(this.props.channelMetrics[channel][metric]).format('(0 a)')
   }
 
   getPercentageIcon (metric) {
@@ -273,7 +273,7 @@ class APIResult extends React.Component {
       return (
         <Icon name='caret-up' size={Metrics.icons.small} color={Colors.smGreen} style={styles.percentageIcon} />
       )
-    } else {
+    } else if (percentage !== '--') {
       return (
         <Icon name='caret-down' size={Metrics.icons.small} color={Colors.smRed} style={styles.percentageIcon} />
       )
@@ -320,7 +320,7 @@ class APIResult extends React.Component {
               return (
                 <View style={styles.channelMetric} key={`${channel}-info`}>
                   {this.getChannelIcon(channel)}
-                  <Text key={`${channel}-metric`}>
+                  <Text key={`${channel}-metric`} style={styles.channelMetricValue}>
                     {this.getChannelMetic('goal_completions', channel)}
                   </Text>
                 </View>
@@ -347,7 +347,7 @@ class APIResult extends React.Component {
               return (
                 <View style={styles.channelMetric} key={`${channel}-info`}>
                   {this.getChannelIcon(channel)}
-                  <Text key={`${channel}-metric`}>
+                  <Text key={`${channel}-metric`} style={styles.channelMetricValue}>
                     {this.getChannelMetic('visits', channel)}
                   </Text>
                 </View>
@@ -374,7 +374,7 @@ class APIResult extends React.Component {
               return (
                 <View style={styles.channelMetric} key={`${channel}-info`}>
                   {this.getChannelIcon(channel)}
-                  <Text key={`${channel}-metric`}>
+                  <Text key={`${channel}-metric`} style={styles.channelMetricValue}>
                     {this.getChannelMetic('revenue', channel)}
                   </Text>
                 </View>
@@ -401,7 +401,7 @@ class APIResult extends React.Component {
               return (
                 <View style={styles.channelMetric} key={`${channel}-info`}>
                   {this.getChannelIcon(channel)}
-                  <Text key={`${channel}-metric`}>
+                  <Text key={`${channel}-metric`} style={styles.channelMetricValue}>
                     {this.getChannelMetic('business_value', channel)}
                   </Text>
                 </View>

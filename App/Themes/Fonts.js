@@ -1,13 +1,13 @@
 // @flow
 
 const type = {
-  base: 'HelveticaNeue',
-  bold: 'HelveticaNeue-Bold',
-  emphasis: 'HelveticaNeue-Italic'
+  base: 'STHeitiTC-Light',
+  bold: 'Heiti TC',
+  emphasis: 'Heiti TC'
 }
 
 const size = {
-  h1: 43,
+  h1: 44,
   h2: 34,
   h3: 30,
   h4: 26,
