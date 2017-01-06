@@ -34,9 +34,30 @@ export default StyleSheet.create({
     padding: 10
   },
 
+  socialROI: {
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    // alignItems: 'center'
+  },
+
+  smallMetricsContainer: {
+    flex: 0,
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'space-around'
+  },
+
   metricHeader: {
     alignSelf: 'center',
     fontSize: Fonts.size.h4,
+    color: Colors.smLightGray,
+    marginTop: 8,
+  },
+
+  smallMetricHeader: {
+    marginTop: 5,
+    marginBottom: 2,
     color: Colors.smLightGray
   },
 
@@ -44,14 +65,28 @@ export default StyleSheet.create({
     flex: 1,
     alignSelf: 'center',
     flexDirection: 'row',
-    alignItems: 'center'
+    alignItems: 'center',
+  },
+
+  smallMetrics: {
+    flex: 0,
+    flexDirection: 'row'
   },
 
   metric: {
     alignSelf: 'center',
     fontSize: Fonts.size.h1,
     marginVertical: Metrics.baseMargin,
-    color: Colors.smDarkGray
+    color: Colors.smDarkGray,
+    fontFamily: Fonts.type.number,
+  },
+
+  smallMetric: {
+    // alignSelf: 'center',
+    fontSize: Fonts.size.h4,
+    // marginVertical: Metrics.baseMargin,
+    color: Colors.smDarkGray,
+    fontFamily: Fonts.type.number,
   },
 
   deltaPercentage: {
@@ -63,7 +98,14 @@ export default StyleSheet.create({
 
   percentage: {
     color: Colors.smLightGray,
-    fontSize: Fonts.size.h5
+    fontSize: Fonts.size.h5,
+    fontFamily: Fonts.type.number,
+  },
+
+  smallPercentage: {
+    color: Colors.smLightGray,
+    fontSize: Fonts.size.small,
+    fontFamily: Fonts.type.number,
   },
 
   percentageIcon: {
@@ -88,6 +130,7 @@ export default StyleSheet.create({
   },
 
   channelMetricValue: {
+    fontFamily: Fonts.type.number,
     color: Colors.smLightGray
   }
 })

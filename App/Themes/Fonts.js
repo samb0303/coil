@@ -3,7 +3,8 @@
 const type = {
   base: 'STHeitiTC-Light',
   bold: 'Heiti TC',
-  emphasis: 'Heiti TC'
+  emphasis: 'Heiti TC',
+  number: 'DIN Alternate'
 }
 
 const size = {

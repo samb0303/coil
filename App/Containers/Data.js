@@ -226,30 +226,77 @@ class APIResult extends React.Component {
       return '--'
     }
     if (metric === 'business_value' || metric === 'revenue') {
-      return numeral(metricValue).format('($ 0.00 a)')
+      return numeral(metricValue).format('($0.00a)')
     } else {
-      return numeral(metricValue).format('(0 a)')
+      return numeral(metricValue).format('(0a)')
     }
   }
 
-  getFormattedMetric (metric) {
-    const metricValue = this.getMetric(metric)
-
-    return (
-      <Text style={styles.metric}>{metricValue}</Text>
-    )
+  getTotalValue () {
+    if (this.props.metrics['business_value'] && this.props.metrics['revenue']) {
+      return numeral(this.props.metrics['business_value'] + this.props.metrics['revenue']).format('($0.00a)')
+    } else if (this.props.metrics['business_value']) {
+      return numeral(this.props.metrics['business_value']).format('($0.00a)')
+    } else if (this.props.metrics['revenue']) {
+      return numeral(this.props.metrics['revenue']).format('($0.00a)')
+    } else {
+      return '--'
+    }
   }
 
-  getFormattedPercentage (metric) {
+  getFormattedMetric (metric, small = false) {
+    let metricValue = ''
+
+    if (metric === 'total_value') {
+      metricValue = this.getTotalValue()
+    } else {
+      metricValue = this.getMetric(metric)
+    }
+
+    if (small) {
+      return (
+        <Text style={styles.smallMetric}>{metricValue}</Text>
+      )
+    } else {
+      return (
+        <Text style={styles.metric}>{metricValue}</Text>
+      )
+    }
+  }
+
+  getFormattedPercentage (metric, small = false) {
     const percentage = this.getPercentage(metric)
 
-    return (
-      <Text style={styles.percentage}>{percentage}</Text>
-    )
+    if (small) {
+      return (
+        <Text style={styles.smallPercentage}>{percentage}</Text>
+      )
+    } else {
+      return (
+        <Text style={styles.percentage}>{percentage}</Text>
+      )
+    }
+  }
+
+  getTotalValuePercentages () {
+    if (this.props.deltaPercentages['business_value'] && this.props.deltaPercentages['revenue']) {
+      return this.props.deltaPercentages['business_value'] + this.props.deltaPercentages['revenue']
+    } else if (this.props.deltaPercentages['business_value']) {
+      return this.props.deltaPercentages['business_value']
+    } else if (this.props.deltaPercentages['revenue']) {
+      return this.props.deltaPercentages['revenue']
+    } else {
+      return false
+    }
   }
 
   getPercentage (metric) {
-    const metricValue = this.props.deltaPercentages[metric]
+    let metricValue = ''
+    if (metric === 'total_value') {
+      metricValue = this.getTotalValuePercentages()
+    } else {
+      metricValue = this.props.deltaPercentages[metric]
+    }
 
     if (!metricValue) {
       return '--'
@@ -258,11 +305,17 @@ class APIResult extends React.Component {
   }
 
   getChannelMetic (metric, channel) {
-    return numeral(this.props.channelMetrics[channel][metric]).format('(0 a)')
+    return numeral(this.props.channelMetrics[channel][metric]).format('(0a)')
   }
 
   getPercentageIcon (metric) {
-    const percentage = this.getPercentage(metric)
+    let percentage = ''
+
+    if (metric === 'total_value') {
+      percentage = this.getPercentage(metric)
+    } else {
+      percentage = this.getPercentage(metric)
+    }
 
     if (percentage > 0) {
       return (
@@ -275,23 +328,40 @@ class APIResult extends React.Component {
     }
   }
 
-  getChannelIcon (channel) {
+  getChannelIcon (channel, small = false) {
     if (channel === 'dark_social') {
-      return (
-        <Icon name='commenting' key={`${channel}-icon`} size={Metrics.icons.medium} color={Colors.smDarkSocial} />
-      )
+      if (small) {
+        return (
+          <Icon name='commenting' key={`${channel}-icon`} size={Metrics.icons.tiny} color={Colors.smDarkSocial} />
+        )
+      } else {
+        return (
+          <Icon name='commenting' key={`${channel}-icon`} size={Metrics.icons.medium} color={Colors.smDarkSocial} />
+        )
+      }
     }
 
     if (channel === 'youtube') {
-      return (
-        <Icon name='youtube-play' key={`${channel}-icon`} size={Metrics.icons.medium} color={Colors.smYoutube} />
-      )
+      if (small) {
+        return (
+          <Icon name='youtube-play' key={`${channel}-icon`} size={Metrics.icons.tiny} color={Colors.smYoutube} />
+        )
+      } else {
+        return (
+          <Icon name='youtube-play' key={`${channel}-icon`} size={Metrics.icons.medium} color={Colors.smYoutube} />
+        )
+      }
     }
 
-    console.tron.log(`COLOR: sm${channel.toUpperCase()}`)
-    return (
-      <Icon name={channel} key={`${channel}-icon`} size={Metrics.icons.medium} color={Colors[`sm${channel.charAt(0).toUpperCase() + channel.slice(1)}`]} />
-    )
+    if (small) {
+      return (
+        <Icon name={channel} key={`${channel}-icon`} size={Metrics.icons.tiny} color={Colors[`sm${channel.charAt(0).toUpperCase() + channel.slice(1)}`]} />
+      )
+    } else {
+      return (
+        <Icon name={channel} key={`${channel}-icon`} size={Metrics.icons.medium} color={Colors[`sm${channel.charAt(0).toUpperCase() + channel.slice(1)}`]} />
+      )
+    }
   }
 
   renderView () {
@@ -299,14 +369,60 @@ class APIResult extends React.Component {
       <View>
         <View style={styles.metricsContainer}>
           <Text style={styles.metricHeader}>
-            PURCHASES
+            TOTAL SOCIAL RETURN
           </Text>
           <View style={styles.metrics}>
-            {this.getFormattedMetric('purchases')}
+            {this.getFormattedMetric('total_value')}
 
             <View style={styles.deltaPercentage}>
-              {this.getPercentageIcon('purchases')}
-              {this.getFormattedPercentage('purchases')}
+              {this.getPercentageIcon('total_value')}
+              {this.getFormattedPercentage('total_value')}
+            </View>
+          </View>
+
+          <View style={styles.socialROI}>
+            <View style={styles.smallMetricsContainer}>
+              <Text style={styles.smallMetricHeader}>
+                BUSINESS VALUE
+              </Text>
+              <View style={styles.smallMetrics}>
+                {this.getFormattedMetric('business_value', true)}
+
+                <View style={styles.deltaPercentage}>
+                  {this.getPercentageIcon('business_value', true)}
+                  {this.getFormattedPercentage('business_value', true)}
+                </View>
+              </View>
+            </View>
+
+            <View style={styles.smallMetricsContainer}>
+              <Text style={styles.smallMetricHeader}>
+                REVENUE
+              </Text>
+              <View style={styles.smallMetrics}>
+                {this.getFormattedMetric('revenue', true)}
+
+                <View style={styles.deltaPercentage}>
+                  {this.getPercentageIcon('revenue', true)}
+                  {this.getFormattedPercentage('revenue', true)}
+                </View>
+              </View>
+            </View>
+
+          </View>
+
+        </View>
+
+        <View style={styles.metricsContainer}>
+          <Text style={styles.metricHeader}>
+            VISITS
+          </Text>
+          <View style={styles.metrics}>
+            {this.getFormattedMetric('visits')}
+
+            <View style={styles.deltaPercentage}>
+              {this.getPercentageIcon('visits')}
+              {this.getFormattedPercentage('visits')}
             </View>
           </View>
 
@@ -316,7 +432,7 @@ class APIResult extends React.Component {
                 <View style={styles.channelMetric} key={`${channel}-info`}>
                   {this.getChannelIcon(channel)}
                   <Text key={`${channel}-metric`} style={styles.channelMetricValue}>
-                    {this.getChannelMetic('purchases', channel)}
+                    {this.getChannelMetic('visits', channel)}
                   </Text>
                 </View>
               )
@@ -380,14 +496,14 @@ class APIResult extends React.Component {
 
         <View style={styles.metricsContainer}>
           <Text style={styles.metricHeader}>
-            VISITS
+            PURCHASES
           </Text>
           <View style={styles.metrics}>
-            {this.getFormattedMetric('visits')}
+            {this.getFormattedMetric('purchases')}
 
             <View style={styles.deltaPercentage}>
-              {this.getPercentageIcon('visits')}
-              {this.getFormattedPercentage('visits')}
+              {this.getPercentageIcon('purchases')}
+              {this.getFormattedPercentage('purchases')}
             </View>
           </View>
 
@@ -397,7 +513,7 @@ class APIResult extends React.Component {
                 <View style={styles.channelMetric} key={`${channel}-info`}>
                   {this.getChannelIcon(channel)}
                   <Text key={`${channel}-metric`} style={styles.channelMetricValue}>
-                    {this.getChannelMetic('visits', channel)}
+                    {this.getChannelMetic('purchases', channel)}
                   </Text>
                 </View>
               )
