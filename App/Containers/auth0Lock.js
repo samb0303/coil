@@ -12,7 +12,7 @@ import styles from './Styles/PresentationScreenStyle'
 import Reactotron from 'reactotron-react-native'
 
 var Auth0Lock = require('react-native-lock')
-var lock = new Auth0Lock({clientId: 'mSd3IB3npgzW25nGn0Ixy1SeL7V2EKKE', domain: 'simplymeasured-prod.auth0.com'})
+var lock = new Auth0Lock({clientId: 'YwDY9D433veMHCred7j0BESjlnwF7ry8', domain: 'simplymeasured.auth0.com'})
 
 export default class auth0Lock extends React.Component {
 
@@ -40,7 +40,7 @@ export default class auth0Lock extends React.Component {
         console.tron.log(error)
       }
 
-      fetch(`https://api.simplymeasured.com/v2/users/${profile.identities[0].userId}/assigned-permissions?include[assigned-permissions]=account&filter[accounts][is_active]=true`, {
+      fetch(`https://api.staging-sm.com/v2/users/${profile.identities[0].userId}/assigned-permissions?include[assigned-permissions]=account&filter[accounts][is_active]=true`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token.idToken}`
