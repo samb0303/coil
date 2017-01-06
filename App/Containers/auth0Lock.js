@@ -1,7 +1,7 @@
 // @flow
 
 import React from 'react'
-import { View, AsyncStorage } from 'react-native'
+import { View, AsyncStorage, ActivityIndicator } from 'react-native'
 import { Actions } from 'react-native-router-flux'
 
 import { Actions as NavigationActions } from 'react-native-router-flux'
@@ -62,6 +62,11 @@ export default class auth0Lock extends React.Component {
   render () {
     return (
       <View style={styles.mainContainer}>
+        <ActivityIndicator
+            style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}
+            size="large"
+            color="black"
+          />
       </View>
     )
   }
