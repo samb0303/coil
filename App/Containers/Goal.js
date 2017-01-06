@@ -1,90 +1,84 @@
 // @flow
 
 import React from 'react'
-import { View, ScrollView, Text, KeyboardAvoidingView, TextInput, Picker, TouchableOpacity, Alert, AsyncStorage } from 'react-native'
-import { connect } from 'react-redux'
+import { View, Text, ListView, TouchableHighlight, AsyncStorage } from 'react-native'
+import { Actions } from 'react-native-router-flux'
 
 // Styles
 import styles from './Styles/GoalStyle'
 
-var GOAL_METRICS = {
-  'impressions': 'Impressions',
-  'visits': 'Visits',
-  'views': 'Page Views',
-  'completions': 'Goal Completions'
-}
+const ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2})
 
-class Goal extends React.Component {
+export default class Goal extends React.Component {
 
   constructor (props) {
     super(props)
 
     this.state = {
-      selectedGoal: 'impressions',
-      selectedGoalDisplayText: 'Impressions'
+      dataSource: ds.cloneWithRows([])
     }
-
-    this.saveAndProceed = this.saveAndProceed.bind(this)
   }
 
-  setGoal (metric) {
-    this.setState({
-      selectedGoal: metric,
-      selectedGoalDisplayText: GOAL_METRICS[metric]
+  populateListWithAccounts () {
+    AsyncStorage.getItem('userAccounts', (err, value) => {
+      if (err !== null) {
+        console.tron.log(String(error))
+        return
+      }
+
+      var accounts = {}
+      JSON.parse(value).forEach((account) => (accounts[account.id] = account.name))
+
+      this.setState({dataSource: ds.cloneWithRows(accounts)})
     })
   }
 
-  saveAndProceed () {
-    try {
-      AsyncStorage.setItem('goalMetric', this.state.selectedGoal)
-      // go to next view
-    } catch (error) {
-      Alert.alert(String(error))
-    }
+  componentDidMount () {
+    this.populateListWithAccounts()
+  }
+
+  rowWasTapped(rowID) {
+    AsyncStorage.setItem('selectedAccount', rowID, (err, value) => {
+      if (err !== null) {
+        console.tron.log(String(err))
+        return
+      }
+
+      Actions.data()
+    })
+  }
+  
+  _renderRow (rowData, sectionID, rowID, highlightRow) {
+    return (
+      <TouchableHighlight
+        underlayColor='#6088E0'
+        onPress={() => {
+          this.rowWasTapped(rowID)
+        }}>
+        <View style={styles.listItem}>
+          <Text style={styles.listItemText}>{rowData}</Text>
+        </View>
+      </TouchableHighlight>
+    )
+  }
+  
+  _renderSeperator(sectionId, rowId) {
+    return (
+      <View key={rowId} style={styles.separator} />
+    )
   }
 
   render () {
     return (
-      <ScrollView style={[styles.mainContainer, styles.goalContainer]}>
-        <KeyboardAvoidingView behavior='position'>
-          <Text style={styles.goalMainText}>
-            I want to set a goal for my {this.state.selectedGoalDisplayText.toLowerCase()}
-          </Text>
-          <Picker
-            onValueChange={(metric) => this.setGoal(metric)}
-            selectedValue={this.state.selectedGoal}>
-            {Object.keys(GOAL_METRICS).map((metric) => (
-              <Picker.Item value={metric} label={GOAL_METRICS[metric]} key={metric} />
-            ))}
-          </Picker>
-          <Text style={styles.goalMainText}>
-            to reach
-          </Text>
-          <View style={styles.centerplease}>
-            <View style={styles.goalTextInputContainer}>
-              <TextInput style={styles.goalTextInput} />
-            </View>
-          </View>
-          <View style={styles.centerplease}>
-            <TouchableOpacity onPress={this.saveAndProceed} style={styles.confirmButton}>
-              <Text style={styles.confirmButtonText}>Let us measure →</Text>
-            </TouchableOpacity>
-          </View>
-        </KeyboardAvoidingView>
-      </ScrollView>
+      <View style={{flex: 1, paddingTop: 52}}>
+        <ListView
+          enableEmptySections={true}
+          dataSource={this.state.dataSource}
+          renderRow={this._renderRow.bind(this)}
+          renderSeparator={this._renderSeperator}
+         />
+       </View>
     )
   }
 
 }
-
-const mapStateToProps = (state) => {
-  return {
-  }
-}
-
-const mapDispatchToProps = (dispatch) => {
-  return {
-  }
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(Goal)
