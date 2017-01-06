@@ -283,18 +283,19 @@ class APIResult extends React.Component {
   getChannelIcon (channel) {
     if (channel === 'dark_social') {
       return (
-        <Icon name='commenting' key={`${channel}-icon`} size={Metrics.icons.medium} color={Colors.smBlue} />
+        <Icon name='commenting' key={`${channel}-icon`} size={Metrics.icons.medium} color={Colors.smDarkSocial} />
       )
     }
 
     if (channel === 'youtube') {
       return (
-        <Icon name='youtube-play' key={`${channel}-icon`} size={Metrics.icons.medium} color={Colors.smBlue} />
+        <Icon name='youtube-play' key={`${channel}-icon`} size={Metrics.icons.medium} color={Colors.smYoutube} />
       )
     }
 
+    console.tron.log(`COLOR: sm${channel.toUpperCase()}`)
     return (
-      <Icon name={channel} key={`${channel}-icon`} size={Metrics.icons.medium} color={Colors.smBlue} />
+      <Icon name={channel} key={`${channel}-icon`} size={Metrics.icons.medium} color={Colors[`sm${channel.charAt(0).toUpperCase() + channel.slice(1)}`]} />
     )
   }
 
